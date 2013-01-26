@@ -1,0 +1,321 @@
+;------------------------------------------------------------------------------
+; rtklib.def : rtklib library defition for windows dll
+;
+; version : $Revision:$ $Date:$
+; history : 2010/12/28 1.0  rtklib ver.2.4.1
+;------------------------------------------------------------------------------
+LIBRARY rtklib
+
+EXPORTS
+; global variables
+lam            DATA
+prcopt_default DATA
+solopt_default DATA
+igpband1       DATA
+igpband2       DATA
+formatstrs     DATA
+sysopts        DATA
+
+; satellites, systems, codes functions
+satno
+satsys
+satid2no
+satno2id
+obs2code
+code2obs
+
+; matrix and vector functions
+mat
+imat
+zeros
+eye
+dot
+norm
+cross3
+normv3
+matcpy
+matmul
+matinv
+solve
+lsq
+filter
+smoother
+matprint
+matfprint
+
+; time and string functions
+str2num
+str2time
+time2str
+epoch2time
+time2epoch
+gpst2time
+time2gpst
+gst2time
+time2gst
+time_str
+timeadd
+timediff
+gpst2utc
+utc2gpst
+timeget
+timeset
+time2doy
+adjgpsweek
+tickget
+sleepms
+reppath
+reppaths
+
+; coordinates transformation
+ecef2pos
+pos2ecef
+ecef2enu
+enu2ecef
+covenu
+covecef
+xyz2enu
+eci2ecef
+deg2dms
+dms2deg
+
+; input and output functions
+readpos
+sortobs
+screent
+readnav
+savenav
+freeobs
+freenav
+
+; debug trace functions
+traceopen
+traceclose
+tracelevel
+trace
+tracet
+tracemat
+traceobs
+tracenav
+tracegnav
+tracehnav
+tracepeph
+tracepclk
+traceb
+
+; platform dependent functions
+execcmd
+expath
+createdir
+
+; positioning models
+satwavelen
+satazel
+geodist
+dops
+csmooth
+
+; atmosphere models
+ionmodel
+ionmapf
+ionppp
+tropmodel
+tropmapf
+iontec
+readtec
+
+; antenna models
+readpcv
+searchpcv
+antmodel
+antmodel_s
+
+; earth tide models
+sunmoonpos
+tidedisp
+
+; geiod models
+opengeoid
+closegeoid
+geoidh
+
+; datum transformation
+loaddatump
+tokyo2jgd
+jgd2tokyo
+
+; rinex functions
+readrnx
+readrnxt
+readrnxc
+setrnxcodepri
+outrnxobsh
+outrnxobsb
+outrnxnavh
+outrnxnavb
+outrnxgnavh
+outrnxgnavb
+outrnxhnavh
+outrnxhnavb
+uncompress
+convrnx
+
+; ephemeris and clock functions
+eph2clk
+geph2clk
+seph2clk
+eph2pos
+geph2pos
+seph2pos
+peph2pos
+satantoff
+satpos
+satposs
+readsp3
+readsap
+readdcb
+alm2pos
+
+; receiver raw data functions
+getbitu
+crc32
+crc24q
+decode_word
+decode_frame
+init_raw
+free_raw
+input_raw
+input_rawf
+input_oem4
+input_oem3
+input_ubx
+input_ss2
+input_cres
+input_stq
+input_gw10
+input_oem4f
+input_oem3f
+input_ubxf
+input_ss2f
+input_cresf
+input_stqf
+input_gw10f
+gen_ubx
+gen_stq
+
+; rtcm functions
+init_rtcm
+free_rtcm
+input_rtcm2
+input_rtcm3
+input_rtcm2f
+input_rtcm3f
+
+; solution functions
+initsolbuf
+freesolbuf
+freesolstatbuf
+getsol
+addsol
+readsol
+readsolt
+readsolstat
+readsolstatt
+inputsol
+outprcopts
+outsolheads
+outsols
+outsolexs
+outprcopt
+outsolhead
+outsol
+outsolex
+outnmea_rmc
+outnmea_gga
+outnmea_gsa
+outnmea_gsv
+
+; google earth kml converter
+convkml
+
+; sbas functions
+sbsreadmsg
+sbsreadmsgt
+sbsoutmsg
+sbsdecodemsg
+sbsupdatecorr
+sbssatcorr
+sbsioncorr
+sbstropcorr
+
+; options functions
+searchopt
+str2opt
+opt2str
+opt2buf
+loadopts
+saveopts
+resetsysopts
+getsysopts
+setsysopts
+
+; stream data input and output functions
+strinitcom
+strinit
+strlock
+strunlock
+stropen
+strclose
+strread
+strwrite
+strsync
+strstat
+strsum
+strsetopt
+strgettime
+strsendnmea
+strsendcmd
+strsettimeout
+strsetdir
+
+; integer ambiguity resolution
+lambda
+
+; standard positioning
+pntpos
+
+; precise positioning
+rtkinit
+rtkfree
+rtkpos
+rtkopenstat
+rtkclosestat
+
+; post-processing positioning
+postpos
+
+; stream server functions
+strsvrinit
+strsvrstart
+strsvrstop
+strsvrstat
+
+; rtk server functions
+rtksvrinit
+rtksvrstart
+rtksvrstop
+rtksvropenstr
+rtksvrclosestr
+rtksvrlock
+rtksvrunlock
+rtksvrostat
+rtksvrsstat
+
+; qzss lex functions
+lexupdatecorr
+lexreadmsg
+lexoutmsg
+lexconvbin
+lexeph2pos
+lexioncorr
+
