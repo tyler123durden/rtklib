@@ -20,6 +20,7 @@
 *                          fix problem with ARM compiler
 *-----------------------------------------------------------------------------*/
 #include "rtklib.h"
+#include <stdint.h>
 
 #define UBXSYNC1    0xB5        /* ubx message sync code 1 */
 #define UBXSYNC2    0x62        /* ubx message sync code 2 */
@@ -40,28 +41,102 @@
 static const char rcsid[]="$Id: ublox.c,v 1.2 2008/07/14 00:05:05 TTAKA Exp $";
 
 /* get/set fields (little-endian) --------------------------------------------*/
-#define U1(p)       (*((unsigned char  *)(p)))
-#define U2(p)       (*((unsigned short *)(p)))
-#define U4(p)       (*((unsigned int   *)(p)))
-#define I1(p)       (*((char   *)(p)))
-#define I2(p)       (*((short  *)(p)))
-#define I4(p)       (*((int    *)(p)))
-#define R4(p)       (*((float  *)(p)))
+#ifdef ALIGN_STRICT
+	#define U1(p)       (*((unsigned char  *)(p)))
+	#define I1(p)       (*((char   *)(p)))
 
-static double R8(const unsigned char *p)
-{
-    double value;
-    unsigned char *q=(unsigned char *)&value;
-    int i;
-    for (i=0;i<8;i++) *q++=*p++;
-    return value;
-}
-static void setR8(unsigned char *p, double value)
-{
-    unsigned char *q=(unsigned char *)&value;
-    int i;
-    for (i=0;i<8;i++) *p++=*q++;
-}
+	static uint16_t U2(const unsigned char * const pa_pnInData)
+	{
+		uint32_t nValue;
+		memcpy(&nValue, pa_pnInData, sizeof(nValue));
+		return nValue;
+	}
+	static uint32_t U4(const unsigned char * const pa_pnInData)
+	{
+		uint32_t nValue;
+		memcpy(&nValue, pa_pnInData, sizeof(nValue));
+		return nValue;
+	}
+	static int16_t I2(const unsigned char * const pa_pnInData)
+	{
+		int16_t nValue;
+		memcpy(&nValue, pa_pnInData, sizeof(nValue));
+		return nValue;
+	}
+	static int32_t I4(const unsigned char * const pa_pnInData)
+	{
+		int32_t nValue;
+		memcpy(&nValue, pa_pnInData, sizeof(nValue));
+		return nValue;
+	}
+	static float R4(const unsigned char * const pa_pnInData)
+	{
+		float nValue;
+		memcpy(&nValue, pa_pnInData, sizeof(nValue));
+		return nValue;
+	}
+	static double R8(const unsigned char * p)
+	{
+		double value;
+		unsigned char *q=(unsigned char *)&value;
+		int i;
+		for (i=0;i<8;i++) *q++=*p++;
+		return value;
+	}
+
+	static void setR8(unsigned char * p_pnDest, double pa_nValue)
+	{
+		memcpy(p_pnDest, &pa_nValue, sizeof(pa_nValue));
+	}
+	#define setR4(__p, __v)		R4(__p)
+	#define setI4(__p, __v)		I4(__p)
+	#define setI2(__p, __v)		I2(__p)
+	#define setU4(__p, __v)		U4(__p)
+	#define setU2(__p, __v)		U2(__p)
+#else
+	#define U1(p)       (*((unsigned char  *)(p)))
+	#define U2(p)       (*((unsigned short *)(p)))
+	#define U4(p)       (*((unsigned int   *)(p)))
+	#define I1(p)       (*((char   *)(p)))
+	#define I2(p)       (*((short  *)(p)))
+	#define I4(p)       (*((int    *)(p)))
+	#define R4(p)       (*((float  *)(p)))
+
+	static double R8(const unsigned char *p)
+	{
+		double value;
+		unsigned char *q=(unsigned char *)&value;
+		int i;
+		for (i=0;i<8;i++) *q++=*p++;
+		return value;
+	}
+
+	static void setR8(unsigned char * p_pnDest, double pa_nValue)
+	{
+		memcpy(p_pnDest, &pa_nValue, sizeof(pa_nValue));
+	}
+	static void setR4(unsigned char * p_pnDest, float pa_nValue)
+	{
+		memcpy(p_pnDest, &pa_nValue, sizeof(pa_nValue));
+	}
+	static void setI4(unsigned char * p_pnDest, int32_t pa_nValue)
+	{
+		memcpy(p_pnDest, &pa_nValue, sizeof(pa_nValue));
+	}
+	static void setI2(unsigned char * p_pnDest, int16_t pa_nValue)
+	{
+		memcpy(p_pnDest, &pa_nValue, sizeof(pa_nValue));
+	}
+	static void setU4(unsigned char * p_pnDest, uint32_t pa_nValue)
+	{
+		memcpy(p_pnDest, &pa_nValue, sizeof(pa_nValue));
+	}
+	static void setU2(unsigned char * p_pnDest, uint16_t pa_nValue)
+	{
+		memcpy(p_pnDest, &pa_nValue, sizeof(pa_nValue));
+	}
+#endif
+
 /* checksum ------------------------------------------------------------------*/
 static int checksum(unsigned char *buff, int len)
 {
@@ -422,19 +497,19 @@ extern int gen_ubx(const char *msg, unsigned char *buff)
     q+=2;
     for (j=1;prm[i][j-1]>0;j++) {
         switch (prm[i][j-1]) {
-            case FU1 : U1(q)=j<narg?(unsigned char )atoi(args[j]):0; q+=1; break;
-            case FU2 : U2(q)=j<narg?(unsigned short)atoi(args[j]):0; q+=2; break;
-            case FU4 : U4(q)=j<narg?(unsigned int  )atoi(args[j]):0; q+=4; break;
-            case FI1 : I1(q)=j<narg?(char          )atoi(args[j]):0; q+=1; break;
-            case FI2 : I2(q)=j<narg?(short         )atoi(args[j]):0; q+=2; break;
-            case FI4 : I4(q)=j<narg?(int           )atoi(args[j]):0; q+=4; break;
-            case FR4 : R4(q)=j<narg?(float         )atof(args[j]):0; q+=4; break;
-            case FR8 : setR8(q,j<narg?(double)atof(args[j]):0); q+=8; break;
+            case FU1 : U1(q)=j<narg?(unsigned char    )atoi(args[j]):0; q+=1; break;
+            case FU2 : setU2(q, j<narg?(unsigned short)atoi(args[j]):0); q+=2; break;
+            case FU4 : setU4(q, j<narg?(unsigned int  )atoi(args[j]):0); q+=4; break;
+            case FI1 : I1(q)=j<narg?(char              )atoi(args[j]):0; q+=1; break;
+            case FI2 : setI2(q, j<narg?(short          )atoi(args[j]):0); q+=2; break;
+            case FI4 : setI4(q, j<narg?(int            )atoi(args[j]):0); q+=4; break;
+            case FR4 : setR4(q, j<narg?(float          )atof(args[j]):0); q+=4; break;
+            case FR8 : setR8(q,j<narg?(double          )atof(args[j]):0); q+=8; break;
             case FS32: sprintf((char *)q,"%-32.32s",j<narg?args[j]:""); q+=32; break;
         }
     }
     n=(int)(q-buff)+2;
-    U2(buff+4)=(unsigned short)(n-8);
+    setU2(buff+4, (unsigned short)(n-8));
     setcs(buff,n);
     
     trace(5,"gen_ubxf: buff=\n"); traceb(5,buff,n);

@@ -5,9 +5,13 @@ SRC    = ../../../src
 
 # for beagleboard
 #CTARGET= -mfpu=neon -mfloat-abi=softfp -ffast-math
-CTARGET= -DENAGLO -DENAQZS -DNFREQ=3
+CTARGET = -DENAGLO -DENAQZS -DNFREQ=3
 
-CFLAGS = -Wall -O3 -ansi -pedantic -I$(SRC) -DTRACE $(CTARGET)
+# for raspberry pi
+#CTARGET= -DENAGLO -DENAQZS -DNFREQ=3 -march=armv6zk -mcpu=arm1176jzf-s -mtune=arm1176jzf-s -mfloat-abi=hard
+#CTARGET += -DALIGN_STRICT
+
+CFLAGS = -Wall -O3 -Wcast-align -ansi -pedantic -I$(SRC) -DTRACE $(CTARGET)
 LDLIBS  = -lm -lpthread
 
 all        : rtkrcv
