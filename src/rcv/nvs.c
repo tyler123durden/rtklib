@@ -80,33 +80,6 @@ static const char rcsid[]="$Id: nvs.c,v 1.0 2012/01/30 00:05:05 MBAVA Exp $";
 	{
 		memcpy(p_pnDest, &pa_nValue, sizeof(pa_nValue));
 	}
-	#define setR4(__p, __v)		R4(__p)
-	#define setI4(__p, __v)		I4(__p)
-	#define setI2(__p, __v)		I2(__p)
-	#define setU4(__p, __v)		U4(__p)
-	#define setU2(__p, __v)		U2(__p)
-#else
-	#define U1(p)       (*((unsigned char  *)(p)))
-	#define U2(p)       (*((unsigned short *)(p)))
-	#define U4(p)       (*((unsigned int   *)(p)))
-	#define I1(p)       (*((char   *)(p)))
-	#define I2(p)       (*((short  *)(p)))
-	#define I4(p)       (*((int    *)(p)))
-	#define R4(p)       (*((float  *)(p)))
-
-	static double R8(const unsigned char *p)
-	{
-		double value;
-		unsigned char *q=(unsigned char *)&value;
-		int i;
-		for (i=0;i<8;i++) *q++=*p++;
-		return value;
-	}
-
-	static void setR8(unsigned char * p_pnDest, double pa_nValue)
-	{
-		memcpy(p_pnDest, &pa_nValue, sizeof(pa_nValue));
-	}
 	static void setR4(unsigned char * p_pnDest, float pa_nValue)
 	{
 		memcpy(p_pnDest, &pa_nValue, sizeof(pa_nValue));
@@ -127,6 +100,33 @@ static const char rcsid[]="$Id: nvs.c,v 1.0 2012/01/30 00:05:05 MBAVA Exp $";
 	{
 		memcpy(p_pnDest, &pa_nValue, sizeof(pa_nValue));
 	}
+
+#else
+	#define U1(p)       (*((unsigned char  *)(p)))
+	#define U2(p)       (*((unsigned short *)(p)))
+	#define U4(p)       (*((unsigned int   *)(p)))
+	#define I1(p)       (*((char   *)(p)))
+	#define I2(p)       (*((short  *)(p)))
+	#define I4(p)       (*((int    *)(p)))
+	#define R4(p)       (*((float  *)(p)))
+
+	static double R8(const unsigned char *p)
+	{
+		double value;
+		unsigned char *q=(unsigned char *)&value;
+		int i;
+		for (i=0;i<8;i++) *q++=*p++;
+		return value;
+	}
+	static void setR8(unsigned char * p_pnDest, double pa_nValue)
+	{
+		memcpy(p_pnDest, &pa_nValue, sizeof(pa_nValue));
+	}
+	#define setR4(__p, __v)		R4(__p)
+	#define setI4(__p, __v)		I4(__p)
+	#define setI2(__p, __v)		I2(__p)
+	#define setU4(__p, __v)		U4(__p)
+	#define setU2(__p, __v)		U2(__p)
 #endif
 
 /* ura values (ref [3] 20.3.3.3.1.1) -----------------------------------------*/
