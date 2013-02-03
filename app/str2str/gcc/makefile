@@ -8,7 +8,7 @@ SRC    = ../../../src
 CTARGET=
 
 OPTION = -DENAGLO -DENAGAL -DENAQZS -DENACMP -DTRACE -DNFREQ=3 -DNEXOBS=3
-CFLAGS = -Wall -O3 -ansi -pedantic -I$(SRC) $(OPTION) $(CTARGET)
+CFLAGS = -Wall -ggdb -O3 -ansi -pedantic -I$(SRC) $(OPTION) $(CTARGET)
 LDLIBS  = -lm -lpthread
 
 all        : str2str
