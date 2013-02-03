@@ -12,11 +12,7 @@ CTARGET=
 #CTARGET += -DALIGN_STRICT
 
 OPTION = -DENAGLO -DENAGAL -DENAQZS -DENACMP -DTRACE -DNFREQ=3 -DNEXOBS=3
-<<<<<<< HEAD
-CFLAGS = -Wall -ggdb -O3 -ansi -pedantic -I$(SRC) $(OPTION) $(CTARGET)
-=======
-CFLAGS = -Wall -O3 -Wcast-align -ansi -pedantic -I$(SRC) $(OPTION) $(CTARGET)
->>>>>>> 61080624f8ff9f07d0e70e70e06422c02428e0e6
+CFLAGS = -Wall -ggdb -O3 -Wcast-align -ansi -pedantic -I$(SRC) $(OPTION) $(CTARGET)
 LDLIBS  = -lm -lpthread
 
 all        : str2str
