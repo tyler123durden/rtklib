@@ -170,11 +170,16 @@ int main(int argc, char **argv)
     strconv_t *conv[MAXSTR]={NULL};
     double pos[3],stapos[3]={0};
     char *paths[MAXSTR],s[MAXSTR][MAXSTRPATH]={{0}},*cmdfile="";
-    char *local="",*proxy="",*msg="1004,1019",*opt="",buff[256],*p;
+    char msg_a[20];
+    char *local="",*proxy="",*msg=msg_a, *opt="",buff[256],*p;
     int i,n=0,dispint=5000,trlevel=0,opts[]={10000,10000,2000,32768,10,0,30};
     int types[MAXSTR]={0},stat[MAXSTR]={0},byte[MAXSTR]={0},bps[MAXSTR]={0};
     int fmts[MAXSTR],sta=0;
     
+    /* don't use this syntax: char *msg="1004,1019";              */
+    /* the array would be created in read only memory -> segfault */
+    strcpy(msg_a,"1004,1019");
+
     for (i=0;i<MAXSTR;i++) paths[i]=s[i];
     
     for (i=1;i<argc;i++) {
@@ -258,8 +263,13 @@ int main(int argc, char **argv)
         
         fprintf(stderr,"%s [%s] %10d B %7d bps %s\n",
                 time_str(utc2gpst(timeget()),0),buff,byte[0],bps[0],msg);
-        
-        sleepms(dispint);
+
+        if(strncmp(msg, "(0) end", sizeof("end"))==0) {
+        	intrflg = 1;
+        }
+        else {
+        	sleepms(dispint);
+        }
     }
     if (*cmdfile) readcmd(cmdfile,cmd,1);
     
