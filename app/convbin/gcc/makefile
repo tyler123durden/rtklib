@@ -4,7 +4,7 @@ BINDIR = /usr/local/bin
 SRC    = ../../../src
 
 OPTS   = -DTRACE -DENAGLO -DENAQZS -DENAGAL -DENACMP -DNFREQ=3 -DNEXOBS=3
-CFLAGS = -Wall -O3 -ansi -pedantic -I$(SRC) $(OPTS)
+CFLAGS = -Wall -ggdb -O3 -ansi -pedantic -I$(SRC) $(OPTS)
 LDLIBS = -lm
 
 convbin    : convbin.o rtkcmn.o rinex.o sbas.o preceph.o rcvraw.o convrnx.o
