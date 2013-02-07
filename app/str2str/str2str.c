@@ -38,7 +38,7 @@ static const char *help[]={
 " console if run foreground or send signal SIGINT for background process.",
 " if run foreground or send signal SIGINT for background process.",
 " if both of the input stream and the output stream follow #format, the",
-" format of input messages are converted to output. To spcify the output",
+" format of input messages are converted to output. To specify the output",
 " messages, use -msg option.",
 " Command options are as follows.",
 "",

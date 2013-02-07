@@ -19,6 +19,8 @@
 *           2011/07/01 1.5 suppress warning
 *-----------------------------------------------------------------------------*/
 #include "rtklib.h"
+#include <stdint.h>
+#include "serialisation_inline.h"
 
 #define CRESSYNC    "$BIN"      /* crescent bin sync code */
 
@@ -34,22 +36,6 @@
 
 static const char rcsid[]="$Id: crescent.c,v 1.2 2008/07/14 00:05:05 TTAKA Exp $";
 
-/* get fields (little-endian) ------------------------------------------------*/
-#define U1(p)       (*((unsigned char *)(p)))
-#define U2(p)       (*((unsigned short *)(p)))
-#define U4(p)       (*((unsigned int *)(p)))
-#define I2(p)       (*((short *)(p)))
-#define I4(p)       (*((int *)(p)))
-#define R4(p)       (*((float *)(p)))
-
-static double R8(const unsigned char *p)
-{
-    double value;
-    unsigned char *q=(unsigned char *)&value;
-    int i;
-    for (i=0;i<8;i++) *q++=*p++;
-    return value;
-}
 /* checksum ------------------------------------------------------------------*/
 static int chksum(const unsigned char *buff, int len)
 {

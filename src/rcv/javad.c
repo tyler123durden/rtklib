@@ -20,6 +20,7 @@
 *           2012/10/18 1.3  change receiver options and rinex obs code
 *-----------------------------------------------------------------------------*/
 #include "rtklib.h"
+#include "serialisation_inline.h"
 
 static const char rcsid[]="$Id:$";
 
@@ -27,27 +28,50 @@ static const char rcsid[]="$Id:$";
 #define ISHEX(c)    (('0'<=(c)&&(c)<='9')||('A'<=(c)&&(c)<='F'))
 #define ROT_LEFT(val) (((val)<<2)|((val)>>6))
 
-/* extract field (little-endian) ---------------------------------------------*/
-#define U1(p) (*((unsigned char *)(p)))
-#define I1(p) (*((char *)(p)))
-#define U2(p) (*((unsigned short *)(p)))
-#define I2(p) (*((short *)(p)))
-#define U4(p) (*((unsigned int *)(p)))
-#define I4(p) (*((int *)(p)))
 
-static float R4(unsigned char *p)
+/* TODO */
+static float _R4(unsigned char *p)
 {
+	float nValue;
+#ifdef BIG_ENDIAN
+	unsigned char * pnValue=(unsigned char *)&nValue + sizeof(nValue);
+	int i;
+#endif
+
     if (U4(p)==0x7FC00000) return 0.0f; /* quiet nan */
-    return *(float*)p;
+#ifdef BIG_ENDIAN
+	for (i=0;i<sizeof(nValue);i++) {
+		*pnValue--=*p++;
+	}
+	return nValue;
+#else
+	#ifdef UNALIGNED_ACCESS
+		return *(float*)p;
+	#else
+		memcpy(&nValue, p, sizeof(nValue));
+		return nValue;
+	#endif
+#endif
 }
-static double R8(unsigned char *p)
+static double _R8(unsigned char *p)
 {
-    double value;
-    unsigned char *q=(unsigned char *)&value;
+    double nValue;
+#ifdef BIG_ENDIAN
+    unsigned char *pnValue=(unsigned char *)&nValue;
     int i;
-    if (U4(p+4)==0x7FF80000&&U4(p)==0) return 0.0; /* quiet nan */
-    for (i=0;i<8;i++) *q++=*p++;
-    return value;
+#endif
+
+    if (U4(p+4)==0x7FF80000 && U4(p)==0) return 0.0; /* quiet nan */
+
+#ifdef BIG_ENDIAN
+	for (i=0;i<sizeof(nValue);i++) {
+		*pnValue--=*p++;
+	}
+	return nValue;
+#else
+	memcpy(&nValue, p, sizeof(nValue));
+	return nValue;
+#endif
 }
 /* decode message length -----------------------------------------------------*/
 static int decodelen(const unsigned char *buff)
@@ -428,27 +452,27 @@ static int decode_eph(raw_t *raw, int sys)
     eph.sva   =I1(p);        p+=1;
     eph.svh   =U1(p);        p+=1;
     week      =I2(p);        p+=2;
-    eph.tgd[0]=R4(p);        p+=4;
-    eph.f2    =R4(p);        p+=4;
-    eph.f1    =R4(p);        p+=4;
-    eph.f0    =R4(p);        p+=4;
+    eph.tgd[0]=_R4(p);        p+=4;
+    eph.f2    =_R4(p);        p+=4;
+    eph.f1    =_R4(p);        p+=4;
+    eph.f0    =_R4(p);        p+=4;
     eph.toes  =I4(p);        p+=4;
     eph.iode  =I2(p);        p+=2;
-    sqrtA     =R8(p);        p+=8;
-    eph.e     =R8(p);        p+=8;
-    eph.M0    =R8(p)*SC2RAD; p+=8;
-    eph.OMG0  =R8(p)*SC2RAD; p+=8;
-    eph.i0    =R8(p)*SC2RAD; p+=8;
-    eph.omg   =R8(p)*SC2RAD; p+=8;
-    eph.deln  =R4(p)*SC2RAD; p+=4;
-    eph.OMGd  =R4(p)*SC2RAD; p+=4;
-    eph.idot  =R4(p)*SC2RAD; p+=4;
-    eph.crc   =R4(p);        p+=4;
-    eph.crs   =R4(p);        p+=4;
-    eph.cuc   =R4(p);        p+=4;
-    eph.cus   =R4(p);        p+=4;
-    eph.cic   =R4(p);        p+=4;
-    eph.cis   =R4(p);        p+=4;
+    sqrtA     =_R8(p);        p+=8;
+    eph.e     =_R8(p);        p+=8;
+    eph.M0    =_R8(p)*SC2RAD; p+=8;
+    eph.OMG0  =_R8(p)*SC2RAD; p+=8;
+    eph.i0    =_R8(p)*SC2RAD; p+=8;
+    eph.omg   =_R8(p)*SC2RAD; p+=8;
+    eph.deln  =_R4(p)*SC2RAD; p+=4;
+    eph.OMGd  =_R4(p)*SC2RAD; p+=4;
+    eph.idot  =_R4(p)*SC2RAD; p+=4;
+    eph.crc   =_R4(p);        p+=4;
+    eph.crs   =_R4(p);        p+=4;
+    eph.cuc   =_R4(p);        p+=4;
+    eph.cus   =_R4(p);        p+=4;
+    eph.cic   =_R4(p);        p+=4;
+    eph.cis   =_R4(p);        p+=4;
     eph.A     =sqrtA*sqrtA;
     
     if (raw->outtype) {
@@ -481,8 +505,8 @@ static int decode_eph(raw_t *raw, int sys)
             trace(2,"javad ephemeris satellite error: sys=%d prn=%d\n",sys,prn);
             return -1;
         }
-        eph.tgd[1]=R4(p); p+=4;    /* BGD: E1-E5A (s) */
-        eph.tgd[2]=R4(p); p+=4+13; /* BGD: E1-E5B (s) */
+        eph.tgd[1]=_R4(p); p+=4;    /* BGD: E1-E5A (s) */
+        eph.tgd[2]=_R4(p); p+=4+13; /* BGD: E1-E5B (s) */
         eph.code  =U1(p);          /* navtype: 0:E1B(INAV),1:E5A(FNAV) */
                                    /*          3:GIOVE E1B,4:GIOVE E5A */
         eph.week=week;
@@ -540,24 +564,24 @@ static int decode_NE(raw_t *raw)
         tb         =I4(p);     p+=4;
         geph.svh   =U1(p)&0x7; p+=1;
         geph.age   =U1(p);     p+=1+1;
-        geph.pos[0]=R8(p)*1E3; p+=8;
-        geph.pos[1]=R8(p)*1E3; p+=8;
-        geph.pos[2]=R8(p)*1E3; p+=8;
-        geph.vel[0]=R4(p)*1E3; p+=4;
-        geph.vel[1]=R4(p)*1E3; p+=4;
-        geph.vel[2]=R4(p)*1E3; p+=4;
-        geph.acc[0]=R4(p)*1E3; p+=4;
-        geph.acc[1]=R4(p)*1E3; p+=4;
-        geph.acc[2]=R4(p)*1E3; p+=4+8;
-        geph.taun  =R4(p);     p+=4;
-        geph.gamn  =R4(p);     p+=4;
+        geph.pos[0]=_R8(p)*1E3; p+=8;
+        geph.pos[1]=_R8(p)*1E3; p+=8;
+        geph.pos[2]=_R8(p)*1E3; p+=8;
+        geph.vel[0]=_R4(p)*1E3; p+=4;
+        geph.vel[1]=_R4(p)*1E3; p+=4;
+        geph.vel[2]=_R4(p)*1E3; p+=4;
+        geph.acc[0]=_R4(p)*1E3; p+=4;
+        geph.acc[1]=_R4(p)*1E3; p+=4;
+        geph.acc[2]=_R4(p)*1E3; p+=4+8;
+        geph.taun  =_R4(p);     p+=4;
+        geph.gamn  =_R4(p);     p+=4;
     }
     else {
         trace(2,"javad NE length error: len=%d\n",raw->len);
         return -1;
     }
     if (raw->len>=93) { /* firmware v 3.2.0 [1] */
-        geph.dtaun =R4(p); p+=4;
+        geph.dtaun =_R4(p); p+=4;
         geph.sva   =U1(p);
     }
     if (raw->outtype) {
@@ -627,11 +651,11 @@ static int decode_WE(raw_t *raw)
     prn     =U1(p); p+=1+1+1;
     seph.sva=U1(p); p+=1;
     tod     =U4(p); p+=4;
-    for (i=0;i<3;i++) {seph.pos[i]=R8(p); p+=8;}
-    for (i=0;i<3;i++) {seph.vel[i]=R4(p); p+=4;}
-    for (i=0;i<3;i++) {seph.acc[i]=R4(p); p+=4;}
-    seph.af0 =R4(p); p+=4;
-    seph.af1 =R4(p); p+=4;
+    for (i=0;i<3;i++) {seph.pos[i]=_R8(p); p+=8;}
+    for (i=0;i<3;i++) {seph.vel[i]=_R4(p); p+=4;}
+    for (i=0;i<3;i++) {seph.acc[i]=_R4(p); p+=4;}
+    seph.af0 =_R4(p); p+=4;
+    seph.af1 =_R4(p); p+=4;
     tow      =U4(p); p+=4;
     week     =U2(p);
     
@@ -680,8 +704,8 @@ static int decode_UO(raw_t *raw)
         trace(2,"javad UO length error: len=%d\n",raw->len);
         return -1;
     }
-    raw->nav.utc_gps[0]=R8(p); p+=8;
-    raw->nav.utc_gps[1]=R4(p); p+=4;
+    raw->nav.utc_gps[0]=_R8(p); p+=8;
+    raw->nav.utc_gps[1]=_R4(p); p+=4;
     raw->nav.utc_gps[2]=U4(p); p+=4;
     raw->nav.utc_gps[3]=adjgpsweek((int)U2(p)); p+=2;
     raw->nav.leaps     =I1(p);
@@ -731,7 +755,7 @@ static int decode_IO(raw_t *raw)
     }
     p+=4+2;
     for (i=0;i<8;i++) {
-        raw->nav.ion_gps[i]=R4(p); p+=4;
+        raw->nav.ion_gps[i]=_R4(p); p+=4;
     }
     return 9;
 }
@@ -963,7 +987,7 @@ static int decode_Rx(raw_t *raw, char code)
         return -1;
     }
     for (i=0;i<raw->obuf.n&&i<MAXOBS;i++) {
-        pr=R8(p); p+=8; if (pr==0.0) continue;
+        pr=_R8(p); p+=8; if (pr==0.0) continue;
         
         sat=raw->obuf.data[i].sat;
         if (!(sys=satsys(sat,NULL))) continue;
@@ -1044,7 +1068,7 @@ static int decode_xR(raw_t *raw, char code)
         return -1;
     }
     for (i=0;i<raw->obuf.n&&i<MAXOBS;i++) {
-        pr=R4(p); p+=4; if (pr==0.0) continue;
+        pr=_R4(p); p+=4; if (pr==0.0) continue;
         
         sat=raw->obuf.data[i].sat;
         if (!(sys=satsys(sat,NULL))||raw->prCA[sat-1]==0.0) continue;
@@ -1113,7 +1137,7 @@ static int decode_Px(raw_t *raw, char code)
         return -1;
     }
     for (i=0;i<raw->obuf.n&&i<MAXOBS;i++) {
-        cp=R8(p); p+=8; if (cp==0.0) continue;
+        cp=_R8(p); p+=8; if (cp==0.0) continue;
         
         if (!(sys=satsys(raw->obuf.data[i].sat,NULL))) continue;
         
@@ -1177,7 +1201,7 @@ static int decode_xP(raw_t *raw, char code)
         return -1;
     }
     for (i=0;i<raw->obuf.n&&i<MAXOBS;i++) {
-        rcp=R4(p); p+=4; if (rcp==0.0) continue;
+        rcp=_R4(p); p+=4; if (rcp==0.0) continue;
         
         sat=raw->obuf.data[i].sat;
         if (!(sys=satsys(sat,NULL))||raw->prCA[sat-1]==0.0) continue;

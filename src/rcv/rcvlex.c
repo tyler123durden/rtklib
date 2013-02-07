@@ -15,6 +15,8 @@
 * history : 2011/05/27 1.0 new
 *-----------------------------------------------------------------------------*/
 #include "rtklib.h"
+#include <stdint.h>
+#include "serialisation_inline.h"
 
 #ifdef EXTLEX
 

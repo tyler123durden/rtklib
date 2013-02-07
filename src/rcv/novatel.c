@@ -35,6 +35,8 @@
 *           2012/11/19 1.12 fix bug on decodeing rangeb
 *-----------------------------------------------------------------------------*/
 #include "rtklib.h"
+#include <stdint.h>
+#include "serialisation_inline.h"
 
 static const char rcsid[]="$Id: novatel.c,v 1.2 2008/07/14 00:05:05 TTAKA Exp $";
 
@@ -85,23 +87,7 @@ static const char rcsid[]="$Id: novatel.c,v 1.2 2008/07/14 00:05:05 TTAKA Exp $"
 
 #define OFF_FRQNO   -7          /* F/W ver.3.620 */
 
-/* get fields (little-endian) ------------------------------------------------*/
-#define U1(p)       (*((unsigned char *)(p)))
-#define I1(p)       (*((char *)(p)))
-#define U2(p)       (*((unsigned short *)(p)))
-#define I2(p)       (*((short *)(p)))
-#define U4(p)       (*((unsigned int *)(p)))
-#define I4(p)       (*((int *)(p)))
-#define R4(p)       (*((float *)(p)))
 
-static double R8(const unsigned char *p)
-{
-    double value;
-    unsigned char *q=(unsigned char *)&value;
-    int i;
-    for (i=0;i<8;i++) *q++=*p++;
-    return value;
-}
 /* extend sign ---------------------------------------------------------------*/
 static int exsign(unsigned int v, int bits)
 {

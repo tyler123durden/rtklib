@@ -23,6 +23,8 @@
 *           2012/05/03 1.4 support S1722GF2-RAW GLONASS
 *-----------------------------------------------------------------------------*/
 #include "rtklib.h"
+#include <stdint.h>
+#include "serialisation_inline.h"
 
 #define STQSYNC1    0xA0        /* skytraq binary sync code 1 */
 #define STQSYNC2    0xA1        /* skytraq binary sync code 2 */
@@ -38,42 +40,6 @@
 
 static const char rcsid[]="$Id:$";
 
-/* extract field (big-endian) ------------------------------------------------*/
-#define U1(p)       (*((unsigned char *)(p)))
-#define I1(p)       (*((char *)(p)))
-
-static unsigned short U2(unsigned char *p)
-{
-    unsigned short value;
-    unsigned char *q=(unsigned char *)&value+1;
-    int i;
-    for (i=0;i<2;i++) *q--=*p++;
-    return value;
-}
-static unsigned int U4(unsigned char *p)
-{
-    unsigned int value;
-    unsigned char *q=(unsigned char *)&value+3;
-    int i;
-    for (i=0;i<4;i++) *q--=*p++;
-    return value;
-}
-static float R4(unsigned char *p)
-{
-    float value;
-    unsigned char *q=(unsigned char *)&value+3;
-    int i;
-    for (i=0;i<4;i++) *q--=*p++;
-    return value;
-}
-static double R8(unsigned char *p)
-{
-    double value;
-    unsigned char *q=(unsigned char *)&value+7;
-    int i;
-    for (i=0;i<8;i++) *q--=*p++;
-    return value;
-}
 /* checksum ------------------------------------------------------------------*/
 static unsigned char checksum(unsigned char *buff, int len)
 {
@@ -95,8 +61,8 @@ static int decode_stqtime(raw_t *raw)
     trace(4,"decode_stqtime: len=%d\n",raw->len);
     
     raw->iod=U1(p+1);
-    week    =U2(p+2);
-    tow     =U4(p+4)*0.001;
+    week    =U2r(p+2);
+    tow     =U4r(p+4)*0.001;
     raw->time=gpst2time(week,tow);
     return 0;
 }
@@ -122,9 +88,9 @@ static int decode_stqraw(raw_t *raw)
         ind                    =U1(p+22);
         prn                    =U1(p);
         raw->obs.data[n].SNR[0]=(unsigned char)(U1(p+1)*4.0+0.5);
-        raw->obs.data[n].P[0]  =(ind&0x1)?R8(p+ 2):0.0;
-        raw->obs.data[n].L[0]  =(ind&0x4)?R8(p+10):0.0;
-        raw->obs.data[n].D[0]  =(ind&0x2)?R4(p+18):0.0f;
+        raw->obs.data[n].P[0]  =(ind&0x1)?R8r(p+ 2):0.0;
+        raw->obs.data[n].L[0]  =(ind&0x4)?R8r(p+10):0.0;
+        raw->obs.data[n].D[0]  =(ind&0x2)?R4r(p+18):0.0f;
         raw->obs.data[n].LLI[0]=(ind&0x8)?1:0; /* slip */
         raw->obs.data[n].code[0]=CODE_L1C;
         
@@ -326,7 +292,7 @@ extern int input_stq(raw_t *raw, unsigned char data)
     raw->buff[raw->nbyte++]=data;
     
     if (raw->nbyte==4) {
-        if ((raw->len=U2(raw->buff+2)+7)>MAXRAWLEN) {
+        if ((raw->len=U2r(raw->buff+2)+7)>MAXRAWLEN) {
             trace(2,"stq message length error: len=%d\n",raw->len);
             raw->nbyte=0;
             return -1;
@@ -361,7 +327,7 @@ extern int input_stqf(raw_t *raw, FILE *fp)
     if (fread(raw->buff+2,1,2,fp)<2) return -2;
     raw->nbyte=4;
     
-    if ((raw->len=U2(raw->buff+2)+7)>MAXRAWLEN) {
+    if ((raw->len=U2r(raw->buff+2)+7)>MAXRAWLEN) {
         trace(2,"stq message length error: len=%d\n",raw->len);
         raw->nbyte=0;
         return -1;

@@ -9,10 +9,16 @@ CTARGET=
 
 # for raspberry pi
 #CTARGET= -DENAGLO -DENAQZS -DNFREQ=3 -march=armv6zk -mcpu=arm1176jzf-s -mtune=arm1176jzf-s -mfloat-abi=hard
-#CTARGET += -DALIGN_STRICT
+
+# for big endian targets use:
+#CTARGET += -DBIG_ENDIAN
+
+# if target allows unaligned data acces to uint16_t, uint32_t and float, you may use this option
+# to speed up serialisation by pointer casts.
+#CTARGET += -DUNALIGNED_ACCESS
 
 OPTION = -DENAGLO -DENAGAL -DENAQZS -DENACMP -DTRACE -DNFREQ=3 -DNEXOBS=3
-CFLAGS = -Wall -ggdb -O3 -Wcast-align -ansi -pedantic -I$(SRC) $(OPTION) $(CTARGET)
+CFLAGS = -Wall -ggdb3 -O3 -Wcast-align -ansi -pedantic -I$(SRC) $(OPTION) $(CTARGET)
 LDLIBS  = -lm -lpthread
 
 all        : str2str
