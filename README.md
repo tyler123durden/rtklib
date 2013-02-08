@@ -1,6 +1,9 @@
 rtklib
 ======
 
+News: 
+merged rtklib 2.4.2b10
+
 1. Quick project overview.
 ======
 
