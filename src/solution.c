@@ -30,6 +30,7 @@
 *                            (2.4.0_p4)
 *           2011/01/23  1.9  fix bug on reading nmea solution data
 *                            add api freesolstatbuf()
+*           2012/02/05  1.10 fix bug on output nmea gpgsv
 *-----------------------------------------------------------------------------*/
 #include <ctype.h>
 #include "rtklib.h"
@@ -1126,7 +1127,7 @@ extern int outnmea_gsv(unsigned char *buff, const sol_t *sol,
     }
     for (sat=1,n=0;sat<MAXSAT&&n<12;sat++) {
         sys=satsys(sat,&prn);
-        if (!sys==SYS_GPS&&!sys==SYS_SBS) continue;
+        if (sys!=SYS_GPS&&sys!=SYS_SBS) continue;
         if (ssat[sat-1].vs&&ssat[sat-1].azel[1]>0.0) sats[n++]=sat;
     }
     nmsg=(n-1)/4+1;

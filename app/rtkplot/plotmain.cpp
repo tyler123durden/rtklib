@@ -48,6 +48,7 @@
 #include "pntdlg.h"
 #include "mapdlg.h"
 #include "geview.h"
+#include "gmview.h"
 #include "viewer.h"
 #pragma link "SHDocVw_OCX"
 
@@ -1591,6 +1592,7 @@ void __fastcall TPlot::TimerTimer(TObject *Sender)
                         UpdateOrigin();
                         ecef2pos(SolData[i].data[0].rr,pos);
                         GoogleEarthView->SetView(pos[0]*R2D,pos[1]*R2D,0.0,0.0);
+                        GoogleMapView->SetView(pos[0]*R2D,pos[1]*R2D,13);
                     }
                     nmsg[i]++;
                 }
@@ -1862,6 +1864,7 @@ void __fastcall TPlot::UpdateOrigin(void)
     }
     ecef2pos(OPos,pos);
     GoogleEarthView->SetView(pos[0]*R2D,pos[1]*R2D,0.0,0.0);
+    GoogleMapView->SetView(pos[0]*R2D,pos[1]*R2D,13);
 }
 // update satellite mask ----------------------------------------------------
 void __fastcall TPlot::UpdateSatMask(void)
@@ -1958,6 +1961,7 @@ void __fastcall TPlot::UpdateEnable(void)
     BtnShowPoint   ->Enabled=(PlotType==PLOT_TRK)&&!BtnSol12->Down;
     BtnAnimate     ->Enabled=data&&BtnShowTrack->Down;
     BtnGE          ->Enabled=SolData[0].n>0||SolData[1].n>0;
+    BtnGM          ->Enabled=SolData[0].n>0||SolData[1].n>0;
     
     if (!BtnShowTrack->Down) {
         BtnAnimate ->Down   =false;
@@ -1978,6 +1982,8 @@ void __fastcall TPlot::UpdateEnable(void)
     MenuFixHoriz   ->Enabled=BtnFixHoriz ->Enabled;
     MenuFixVert    ->Enabled=BtnFixVert  ->Enabled;
     MenuShowPoint  ->Enabled=BtnShowPoint->Enabled;
+    MenuGE         ->Enabled=BtnGE       ->Enabled;
+    MenuGM         ->Enabled=BtnGM       ->Enabled;
     
     MenuShowTrack  ->Checked=BtnShowTrack->Down;
     MenuFixCent    ->Checked=BtnFixCent  ->Down;
@@ -2095,6 +2101,7 @@ void __fastcall TPlot::SetRange(int all, double range)
         if (norm(OPos,3)>0.0) {
             ecef2pos(OPos,pos);
             GoogleEarthView->SetView(pos[0]*R2D,pos[1]*R2D,0.0,0.0);
+            GoogleMapView->SetView(pos[0]*R2D,pos[1]*R2D,13);
         }
 #endif
     }
@@ -2482,8 +2489,20 @@ void __fastcall TPlot::SaveOpt(void)
     
     ini->WriteString ("solbrows","dir",FileSelDialog->Dir);
     
-    
     delete ini;
+}
+//---------------------------------------------------------------------------
+void __fastcall TPlot::MenuGMClick(TObject *Sender)
+{
+	BtnGMClick(Sender);
+}
+//---------------------------------------------------------------------------
+void __fastcall TPlot::BtnGMClick(TObject *Sender)
+{
+    AnsiString s;
+    GoogleMapView->Caption=
+        s.sprintf("%s ver.%s: Google Map View",PRGNAME,VER_RTKLIB);
+	GoogleMapView->Show();
 }
 //---------------------------------------------------------------------------
 

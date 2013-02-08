@@ -10,6 +10,7 @@
 *           2012/12/25  1.3  add format conversion functions
 *                            add -msg, -opt and -sta options
 *                            modify -p option
+*           2013/01/25  1.4  fix bug on showing message
 *-----------------------------------------------------------------------------*/
 #include <signal.h>
 #include <unistd.h>
@@ -238,9 +239,10 @@ int main(int argc, char **argv)
     
     strsvrinit(&strsvr,n+1);
     
-    traceopen(TRFILE);
-    tracelevel(trlevel);
-    
+    if (trlevel>0) {
+        traceopen(TRFILE);
+        tracelevel(trlevel);
+    }
     fprintf(stderr,"stream server start\n");
     
     strsetdir(local);
@@ -278,6 +280,9 @@ int main(int argc, char **argv)
     
     for (i=0;i<n;i++) {
         strconvfree(conv[i]);
+    }
+    if (trlevel>0) {
+        traceclose();
     }
     fprintf(stderr,"stream server stop\n");
     return 0;

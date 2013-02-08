@@ -225,6 +225,9 @@ __published:
 	TSpeedButton *BtnOptions;
 	TSpeedButton *BtnFixCent;
 	TMenuItem *MenuFixCent;
+	TSpeedButton *BtnGM;
+	TMenuItem *SaveSNRMPandAZEL1;
+	TMenuItem *MenuGM;
 	
 	void __fastcall FormCreate			(TObject *Sender);
 	void __fastcall FormShow			(TObject *Sender);
@@ -323,6 +326,8 @@ __published:
 	void __fastcall BtnOptionsClick(TObject *Sender);
 	void __fastcall BtnFixCentClick(TObject *Sender);
 	void __fastcall MenuFixCentClick(TObject *Sender);
+	void __fastcall BtnGMClick(TObject *Sender);
+	void __fastcall MenuGMClick(TObject *Sender);
 
 
 protected:
@@ -572,6 +577,7 @@ public:
     int __fastcall GetCenterPos(double *rr);
     void __fastcall UpdatePlot(void);
     void __fastcall Refresh_GEView(void);
+    void __fastcall Refresh_GMView(void);
 };
 //---------------------------------------------------------------------------
 extern PACKAGE TPlot *Plot;

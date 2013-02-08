@@ -25,6 +25,6 @@ cd ..
 cd rtkget
 call clean.bat
 cd ..
-cd launcher
+cd rtklaunch
 call clean.bat
 cd ..

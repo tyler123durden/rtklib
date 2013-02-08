@@ -14,6 +14,7 @@
 *           2012/12/12 1.1  support gal/qzs ephemeris, gal/qzs ssr, msm
 *                           add station id consistency test for obs data
 *           2012/12/25 1.2  change compass msm id table
+*           2013/01/31 1.3  change signal id by the latest draft (ref [13])
 *-----------------------------------------------------------------------------*/
 #include "rtklib.h"
 
@@ -46,34 +47,34 @@ typedef struct {                    /* multi-signal-message header type */
 } msm_h_t;
 
 /* msm signal id table -------------------------------------------------------*/
-const char *msm_sig_gps[32]={ /* GPS: ref [11] table 3.5-86 */
-    ""  ,"1C","1P","1W",""  ,""  ,""  ,"2C","2P","2W",""  ,""  , /*  1-12 */
+const char *msm_sig_gps[32]={ /* GPS: ref [13] table 3.5-87 */
+    ""  ,"1C","1P","1W","1Y","1M",""  ,"2C","2P","2W","2Y","2M", /*  1-12 */
     ""  ,""  ,"2S","2L","2X",""  ,""  ,""  ,""  ,"5I","5Q","5X", /* 13-24 */
     ""  ,""  ,""  ,""  ,""  ,"1S","1L","1X"                      /* 25-32 */
 };
-const char *msm_sig_glo[32]={ /* GLONASS: ref [11] table 3.5-90 */
-    ""  ,"1C","1P",""  ,""  ,""  ,""  ,"2C","2P",""  ,""  ,""  ,
-    ""  ,""  ,""  ,""  ,""  ,""  ,""  ,""  ,""  ,""  ,""  ,""  ,
+const char *msm_sig_glo[32]={ /* GLONASS: ref [13] table 3.5-93 */
+    ""  ,"1C","1P",""  ,""  ,""  ,""  ,"2C","2P",""  ,"3I","3Q",
+    "3X",""  ,""  ,""  ,""  ,""  ,""  ,""  ,""  ,""  ,""  ,""  ,
     ""  ,""  ,""  ,""  ,""  ,""  ,""  ,""
 };
-const char *msm_sig_gal[32]={ /* Galileo: ref [11] table 3.5-93 */
-    ""  ,"1C",""  ,"1B","1A","1X","1Z","6C",""  ,"6B","6A","6X",
-    "6Z","7I","7Q","7X",""  ,"8I","8Q","8X",""  ,"5I","5Q","5X",
+const char *msm_sig_gal[32]={ /* Galileo: ref [13] table 3.5-96 */
+    ""  ,"1C","1A","1B","1X","1Z",""  ,"6C","6A","6B","6X","6Z",
+    ""  ,"7I","7Q","7X",""  ,"8I","8Q","8X",""  ,"5I","5Q","5X",
     ""  ,""  ,""  ,""  ,""  ,""  ,""  ,""
 };
-const char *msm_sig_qzs[32]={ /* QZSS: ref [12] table 3.5-96 */
-    ""  ,"1C",""  ,""  ,""  ,"1Z",""  ,"2C","6S","6L","6X",""  ,
+const char *msm_sig_qzs[32]={ /* QZSS: ref [13] table 3.5-T+003 */
+    ""  ,"1C",""  ,""  ,""  ,"1Z",""  ,""  ,"6S","6L","6X",""  ,
     ""  ,""  ,"2S","2L","2X",""  ,""  ,""  ,""  ,"5I","5Q","5X",
     ""  ,""  ,""  ,""  ,""  ,"1S","1L","1X"
 };
-const char *msm_sig_sbs[32]={ /* SBAS: tentative */
+const char *msm_sig_sbs[32]={ /* SBAS: ref [13] table 3.5-T+005 */
     ""  ,"1C",""  ,""  ,""  ,""  ,""  ,""  ,""  ,""  ,""  ,""  ,
     ""  ,""  ,""  ,""  ,""  ,""  ,""  ,""  ,""  ,"5I","5Q","5X",
     ""  ,""  ,""  ,""  ,""  ,""  ,""  ,""
 };
-const char *msm_sig_cmp[32]={ /* Copmass: tentative */
-    ""  ,"2I",""  ,""  ,""  ,""  ,""  ,"6I",""  ,""  ,""  ,""  ,
-    ""  ,"7I",""  ,""  ,""  ,""  ,""  ,""  ,""  ,""  ,""  ,""  ,
+const char *msm_sig_cmp[32]={ /* BeiDou: ref [13] table 3.5-T+012 */
+    ""  ,"2I","2Q","2X",""  ,""  ,""  ,"6I","6Q","6X",""  ,""  ,
+    ""  ,"7I","7Q","7X",""  ,""  ,""  ,""  ,""  ,""  ,""  ,""  ,
     ""  ,""  ,""  ,""  ,""  ,""  ,""  ,""
 };
 /* ssr update intervals ------------------------------------------------------*/
@@ -679,8 +680,8 @@ static int decode_type1019(rtcm_t *rtcm)
     
     if (rtcm->outtype) {
         msg=rtcm->msgtype+strlen(rtcm->msgtype);
-        sprintf(msg," prn=%2d iode=%3d iodc=%3d toe=%6.0f",prn,eph.iode,
-                eph.iodc,eph.toes);
+        sprintf(msg," prn=%2d iode=%3d iodc=%3d week=%d toe=%6.0f toc=%6.0f svh=%02X",
+                prn,eph.iode,eph.iodc,week,eph.toes,toc,eph.svh);
     }
     if (!(sat=satno(sys,prn))) {
         trace(2,"rtcm3 1019 satellite number error: prn=%d\n",prn);
@@ -739,7 +740,8 @@ static int decode_type1020(rtcm_t *rtcm)
     
     if (rtcm->outtype) {
         msg=rtcm->msgtype+strlen(rtcm->msgtype);
-        sprintf(msg," prn=%2d tk=%02.0f:%02.0f:%02.0f",prn,tk_h,tk_m,tk_s);
+        sprintf(msg," prn=%2d tk=%02.0f:%02.0f:%02.0f frq=%2d bn=%d tb=%d",
+                prn,tk_h,tk_m,tk_s,geph.frq,bn,tb);
     }
     geph.sat=sat;
     geph.svh=bn;
@@ -868,8 +870,8 @@ static int decode_type1044(rtcm_t *rtcm)
     
     if (rtcm->outtype) {
         msg=rtcm->msgtype+strlen(rtcm->msgtype);
-        sprintf(msg," prn=%2d iode=%3d iodc=%3d toe=%6.0f",prn,eph.iode,
-                eph.iodc,eph.toes);
+        sprintf(msg," prn=%3d iode=%3d iodc=%3d week=%d toe=%6.0f toc=%6.0f svh=%02X",
+                prn,eph.iode,eph.iodc,week,eph.toes,toc,eph.svh);
     }
     if (!(sat=satno(sys,prn))) {
         trace(2,"rtcm3 1044 satellite number error: prn=%d\n",prn);
@@ -936,7 +938,8 @@ static int decode_type1045(rtcm_t *rtcm)
     
     if (rtcm->outtype) {
         msg=rtcm->msgtype+strlen(rtcm->msgtype);
-        sprintf(msg," prn=%2d iode=%3d toe=%6.0f",prn,eph.iode,eph.toes);
+        sprintf(msg," prn=%2d iode=%3d week=%d toe=%6.0f toc=%6.0f hs=%d dvs=%d",
+                prn,eph.iode,week,eph.toes,toc,e5a_hs,e5a_dvs);
     }
     if (!(sat=satno(sys,prn))) {
         trace(2,"rtcm3 1045 satellite number error: prn=%d\n",prn);
@@ -1005,7 +1008,8 @@ static int decode_type1046(rtcm_t *rtcm)
     
     if (rtcm->outtype) {
         msg=rtcm->msgtype+strlen(rtcm->msgtype);
-        sprintf(msg," prn=%2d iode=%3d toe=%6.0f",prn,eph.iode,eph.toes);
+        sprintf(msg," prn=%2d iode=%3d week=%d toe=%6.0f toc=%6.0f hs=%d dvs=%d",
+                prn,eph.iode,week,eph.toes,toc,e1b_hs,e1b_dvs);
     }
     if (!(sat=satno(sys,prn))) {
         trace(2,"rtcm3 1046 satellite number error: prn=%d\n",prn);
@@ -1068,8 +1072,8 @@ static int decode_ssr1_head(rtcm_t *rtcm, int sys, int *sync, int *iod,
     
     if (rtcm->outtype) {
         msg=rtcm->msgtype+strlen(rtcm->msgtype);
-        sprintf(msg," %s nsat=%2d iod=%2d sync=%d",time_str(rtcm->time,2),nsat,
-                *iod,*sync);
+        sprintf(msg," %s nsat=%2d iod=%2d udi=%2d sync=%d",
+                time_str(rtcm->time,2),nsat,*iod,udi,*sync);
     }
     *hsize=i;
     return nsat;
@@ -1110,8 +1114,8 @@ static int decode_ssr2_head(rtcm_t *rtcm, int sys, int *sync, int *iod,
     
     if (rtcm->outtype) {
         msg=rtcm->msgtype+strlen(rtcm->msgtype);
-        sprintf(msg," %s nsat=%2d iod=%2d sync=%d",time_str(rtcm->time,2),nsat,
-                *iod,*sync);
+        sprintf(msg," %s nsat=%2d iod=%2d udi=%2d sync=%d",
+                time_str(rtcm->time,2),nsat,*iod,udi,*sync);
     }
     *hsize=i;
     return nsat;
@@ -1149,11 +1153,11 @@ static int decode_ssr1(rtcm_t *rtcm, int sys)
             trace(2,"rtcm3 %d satellite number error: prn=%d\n",type,prn);
             continue;
         }
-        rtcm->ssr[sat-1].t0=rtcm->time;
-        rtcm->ssr[sat-1].udint=udint;
+        rtcm->ssr[sat-1].t0 [0]=rtcm->time;
+        rtcm->ssr[sat-1].udi[0]=udint;
+        rtcm->ssr[sat-1].iod[0]=iod;
         rtcm->ssr[sat-1].iode=iode;
         rtcm->ssr[sat-1].refd=refd;
-        rtcm->ssr[sat-1].iod[0]=iod;
         
         for (k=0;k<3;k++) {
             rtcm->ssr[sat-1].deph [k]=deph [k];
@@ -1197,8 +1201,8 @@ static int decode_ssr2(rtcm_t *rtcm, int sys)
             trace(2,"rtcm3 %d satellite number error: prn=%d\n",type,prn);
             continue;
         }
-        rtcm->ssr[sat-1].t0=rtcm->time;
-        rtcm->ssr[sat-1].udint=udint;
+        rtcm->ssr[sat-1].t0 [1]=rtcm->time;
+        rtcm->ssr[sat-1].udi[1]=udint;
         rtcm->ssr[sat-1].iod[1]=iod;
         
         for (k=0;k<3;k++) {
@@ -1269,8 +1273,8 @@ static int decode_ssr3(rtcm_t *rtcm, int sys)
             trace(2,"rtcm3 %d satellite number error: prn=%d\n",type,prn);
             continue;
         }
-        rtcm->ssr[sat-1].t0=rtcm->time;
-        rtcm->ssr[sat-1].udint=udint;
+        rtcm->ssr[sat-1].t0 [4]=rtcm->time;
+        rtcm->ssr[sat-1].udi[4]=udint;
         rtcm->ssr[sat-1].iod[4]=iod;
         
         for (k=0;k<MAXCODE;k++) {
@@ -1317,11 +1321,11 @@ static int decode_ssr4(rtcm_t *rtcm, int sys)
             trace(2,"rtcm3 %d satellite number error: prn=%d\n",type,prn);
             continue;
         }
-        rtcm->ssr[sat-1].t0=rtcm->time;
-        rtcm->ssr[sat-1].udint=udint;
+        rtcm->ssr[sat-1].t0 [0]=rtcm->ssr[sat-1].t0 [1]=rtcm->time;
+        rtcm->ssr[sat-1].udi[0]=rtcm->ssr[sat-1].udi[1]=udint;
+        rtcm->ssr[sat-1].iod[0]=rtcm->ssr[sat-1].iod[1]=iod;
         rtcm->ssr[sat-1].iode=iode;
         rtcm->ssr[sat-1].refd=refd;
-        rtcm->ssr[sat-1].iod[0]=rtcm->ssr[sat-1].iod[1]=iod;
         
         for (k=0;k<3;k++) {
             rtcm->ssr[sat-1].deph [k]=deph [k];
@@ -1364,8 +1368,8 @@ static int decode_ssr5(rtcm_t *rtcm, int sys)
             trace(2,"rtcm3 %d satellite number error: prn=%d\n",type,prn);
             continue;
         }
-        rtcm->ssr[sat-1].t0=rtcm->time;
-        rtcm->ssr[sat-1].udint=udint;
+        rtcm->ssr[sat-1].t0 [3]=rtcm->time;
+        rtcm->ssr[sat-1].udi[3]=udint;
         rtcm->ssr[sat-1].iod[3]=iod;
         rtcm->ssr[sat-1].ura=ura;
         rtcm->ssr[sat-1].update=1;
@@ -1404,8 +1408,8 @@ static int decode_ssr6(rtcm_t *rtcm, int sys)
             trace(2,"rtcm3 %d satellite number error: prn=%d\n",type,prn);
             continue;
         }
-        rtcm->ssr[sat-1].t0=rtcm->time;
-        rtcm->ssr[sat-1].udint=udint;
+        rtcm->ssr[sat-1].t0 [2]=rtcm->time;
+        rtcm->ssr[sat-1].udi[2]=udint;
         rtcm->ssr[sat-1].iod[2]=iod;
         rtcm->ssr[sat-1].hrclk=hrclk;
         rtcm->ssr[sat-1].update=1;

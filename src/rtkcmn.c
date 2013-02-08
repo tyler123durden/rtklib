@@ -356,13 +356,16 @@ extern void satno2id(int sat, char *id)
 *-----------------------------------------------------------------------------*/
 extern int satexclude(int sat, int svh, const prcopt_t *opt)
 {
+    int sys=satsys(sat,NULL);
+    
     if (svh<0) return 1; /* ephemeris unavailable */
     
     if (opt) {
         if (opt->exsats[sat-1]==1) return 1; /* excluded satellite */
         if (opt->exsats[sat-1]==2) return 0; /* included satellite */
+        if (!(sys&opt->navsys)) return 1; /* unselected sat sys */
     }
-    if (satsys(sat,NULL)==SYS_QZS) svh&=0xFE; /* mask QZSS LEX health */
+    if (sys==SYS_QZS) svh&=0xFE; /* mask QZSS LEX health */
     if (svh) {
         trace(3,"unhealthy satellite: sat=%3d svh=%02X\n",sat,svh);
         return 1;

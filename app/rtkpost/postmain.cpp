@@ -527,7 +527,7 @@ void __fastcall TMainForm::BtnInputPlot2Click(TObject *Sender)
     if (files[2]=="") {
         if (ObsToNav(files[0].c_str(),navfile)) files[2]=navfile;
     }
-    opts="rtkplot -r \""+files[1]+"\" \""+files[2]+"\" \""+files[3]+"\" \""+
+    opts=" -r \""+files[1]+"\" \""+files[2]+"\" \""+files[3]+"\" \""+
          files[4]+"\"";
     
     if (!ExecCmd(cmd1+opts,1)&&!ExecCmd(cmd2+opts,1)) {

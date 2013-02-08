@@ -18,6 +18,8 @@
 *           2011/07/07 1.1  fix QZSS IODC-only-update problem
 *           2012/07/17 1.2  change GALILEO scale factor for short pseudorange
 *           2012/10/18 1.3  change receiver options and rinex obs code
+*           2013/01/24 1.4  change compass factor for short pseudorange
+*                           add raw option -NOET
 *-----------------------------------------------------------------------------*/
 #include "rtklib.h"
 #include "serialisation_inline.h"
@@ -1034,7 +1036,7 @@ static int decode_rx(raw_t *raw, char code)
         }
         if      (sys==SYS_SBS) prm=(pr*1E-11+0.115)*CLIGHT;
         else if (sys==SYS_QZS) prm=(pr*2E-11+0.125)*CLIGHT; /* [3] */
-        else if (sys==SYS_CMP) prm=(pr*2E-11+0.125)*CLIGHT; /* [3] */
+        else if (sys==SYS_CMP) prm=(pr*2E-11+0.105)*CLIGHT; /* [4] */
         else if (sys==SYS_GAL) prm=(pr*1E-11+0.090)*CLIGHT; /* [3] */
         else                   prm=(pr*1E-11+0.075)*CLIGHT;
         
@@ -1479,7 +1481,10 @@ static int decode_javad(raw_t *raw)
         sprintf(raw->msgtype,"JAVAD %2.2s (%4d)",p,raw->len);
     }
     if (!strncmp(p,"~~",2)) return decode_RT(raw); /* receiver time */
-    if (!strncmp(p,"::",2)) return decode_ET(raw); /* epoch time */
+    
+    if (strstr(raw->opt,"-NOET")) {
+        if (!strncmp(p,"::",2)) return decode_ET(raw); /* epoch time */
+    }
     if (!strncmp(p,"RD",2)) return decode_RD(raw); /* receiver date */
     if (!strncmp(p,"SI",2)) return decode_SI(raw); /* satellite indices */
     if (!strncmp(p,"NN",2)) return decode_NN(raw); /* glonass slot numbers */
@@ -1562,6 +1567,7 @@ static void clearbuff(raw_t *raw)
 *                "-JL1Z" : use L1Z for QZS (default L1C)
 *                "-JL1X" : use L1X for QZS (default L1C)
 *                "-EPHALL" : output all ephemeris
+*                "-NOET" : discard epoch time message ET (::)
 *          unsigned char data I stream data (1 byte)
 * return : status (-1: error message, 0: no message, 1: input observation data,
 *                  2: input ephemeris, 3: input sbas message,

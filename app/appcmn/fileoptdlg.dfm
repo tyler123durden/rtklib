@@ -136,7 +136,6 @@ object FileOptDialog: TFileOptDialog
     Top = 48
     Width = 51
     Height = 21
-    ItemHeight = 13
     ItemIndex = 3
     TabOrder = 4
     Text = 'x1'
@@ -156,7 +155,6 @@ object FileOptDialog: TFileOptDialog
     Width = 45
     Height = 21
     DropDownCount = 10
-    ItemHeight = 13
     TabOrder = 6
     Items.Strings = (
       ''
@@ -172,7 +170,6 @@ object FileOptDialog: TFileOptDialog
   object SaveDialog: TSaveDialog
     Filter = 'All File (*.*)|*.*|Position File (*.pos)|*.pos'
     Options = [ofHideReadOnly, ofNoChangeDir, ofEnableSizing]
-    OptionsEx = [ofExNoPlacesBar]
     Title = 'Output File'
     Left = 256
     Top = 8
@@ -180,7 +177,6 @@ object FileOptDialog: TFileOptDialog
   object OpenDialog: TOpenDialog
     Filter = 'All File (*.*)|*.*|Position File (*.pos)|*.pos'
     Options = [ofHideReadOnly, ofNoChangeDir, ofEnableSizing]
-    OptionsEx = [ofExNoPlacesBar]
     Title = 'Input File'
     Left = 284
     Top = 8

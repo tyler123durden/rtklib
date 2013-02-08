@@ -1,7 +1,7 @@
 /*------------------------------------------------------------------------------
 * tle.c: NORAD TLE (two line element) functions
 *
-*          Copyright (C) 2012 by T.TAKASU, All rights reserved.
+*          Copyright (C) 2012-2013 by T.TAKASU, All rights reserved.
 *
 * references:
 *     [1] F.R.Hoots and R.L.Roehrich, Spacetrack report No.3, Models for
@@ -12,6 +12,7 @@
 *
 * version : $Revision:$ $Date:$
 * history : 2012/11/01 1.0  new
+*           2013/01/25 1.1  fix bug on binary search
 *-----------------------------------------------------------------------------*/
 #include "rtklib.h"
 
@@ -509,15 +510,10 @@ extern int tle_pos(gtime_t time, const char *name, const char *satno,
     
     /* binary search by satellite name */
     if (*name) {
-        if (tle->n==1) {
-            stat=strcmp(name,tle->data[i].name);
-        }
-        else {
-            for (j=0,k=tle->n-1;j<k-1;) {
-                i=(j+k)/2;
-                if (!(stat=strcmp(name,tle->data[i].name))) break;
-                if (stat<0) k=i; else j=i;
-            }
+        for (i=j=0,k=tle->n-1;j<=k;) {
+            i=(j+k)/2;
+            if (!(stat=strcmp(name,tle->data[i].name))) break;
+            if (stat<0) k=i-1; else j=i+1;
         }
     }
     /* serial search by catalog no or international designator */

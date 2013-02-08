@@ -9,9 +9,8 @@ OPTS    = -DTRACE -DENAGLO -DENAQZS -DENAGAL -DNFREQ=3
 #CFLAGS  = -Wall -O3 -ansi -pedantic -I$(SRC) $(OPTS)
 #LDLIBS  = -lm
 
-CFLAGS  = -Wall -ggdb -O3 -ansi -pedantic -I$(SRC) -DLAPACK $(OPTS)
-# LDLIBS  = -lm -llapack -lblas
-LDLIBS  = -lm  -L/usr/lib/lapack -L/usr/lib/libblas -L/usr/lib -llapack -lblas
+CFLAGS  = -Wall -O3 -ansi -pedantic -I$(SRC) -DLAPACK $(OPTS)
+LDLIBS  = -lm -llapack -lblas
 
 # for gprof
 #CFLAGS  = -Wall -O3 -ansi -pedantic -I$(SRC) -DLAPACK $(OPTS) -pg

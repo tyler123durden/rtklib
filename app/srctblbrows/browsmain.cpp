@@ -7,6 +7,7 @@
 #include "aboutdlg.h"
 #include "gmview.h"
 #include "browsmain.h"
+#include "staoptdlg.h"
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
 #pragma resource "*.dfm"
@@ -71,6 +72,8 @@ __fastcall TMainForm::TMainForm(TComponent* Owner)
     IniFile=file;
     
     strinitcom();
+    
+    StaList=new TStringList;
 }
 //---------------------------------------------------------------------------
 void __fastcall TMainForm::FormShow(TObject *Sender)
@@ -79,9 +82,9 @@ void __fastcall TMainForm::FormShow(TObject *Sender)
 	AnsiString colw1="112,40,96,126,18,28,50,50,160,40,600,0,0,0,0,0,0,0,";
 	AnsiString colw2="80,126,18,18,300,300,300,600,0,0,0,0,0,0,0,0,0,0,";
 	TIniFile *ini=new TIniFile(IniFile);
-	AnsiString title,list,colw,cmd,url="";
+	AnsiString title,list,colw,cmd,url="",s,stas;
 	int i,w,argc=0;
-	char *p,*q,buff[1024],*argv[32];
+	char *p,*q,buff[8192],*argv[32];
 	
 	FontScale=Screen->PixelsPerInch;
 	Table0->DefaultRowHeight=16*FontScale/96;
@@ -127,15 +130,25 @@ void __fastcall TMainForm::FormShow(TObject *Sender)
 		if (!(q=strchr(p,','))) break; else *q='\0';
 		Table2->ColWidths[i]=atoi(p)*FontScale/96;
 	}
+    StaList->Clear();
+    for (int i=0;i<10;i++) {
+        stas=ini->ReadString("sta",s.sprintf("station%d",i),"");
+        strcpy(buff,stas.c_str());
+        for (p=strtok(buff,",");p;p=strtok(NULL,",")) {
+            StaList->Add(p);
+        }
+    }
 	delete ini;
 	
 	ShowTable();
+	UpdateEnable();
 }
 //---------------------------------------------------------------------------
 void __fastcall TMainForm::FormClose(TObject *Sender, TCloseAction &Action)
 {
 	TIniFile *ini=new TIniFile(IniFile);
-	AnsiString s,list,colw;
+	AnsiString s,list,colw,sta;
+    char buff[8192]="",*p;
 	
 	ini->WriteString("srctbl","address",Address->Text);
 	for (int i=0;i<Address->Items->Count;i++) {
@@ -157,6 +170,15 @@ void __fastcall TMainForm::FormClose(TObject *Sender, TCloseAction &Action)
 		colw=colw+s.sprintf("%d,",Table2->ColWidths[i]*96/FontScale);
 	}
 	ini->WriteString("srctbl","colwidth2",colw);
+    
+    for (int i=0,j=0;i<10;i++) {
+        p=buff; *p='\0';
+        for (int k=0;k<256&&j<StaList->Count;k++) {
+            sta=StaList->Strings[j++];
+            p+=sprintf(p,"%s%s",k==0?"":",",sta.c_str());
+        }
+        ini->WriteString ("sta",s.sprintf("station%d",i),buff);
+    }
 	delete ini;
 }
 //---------------------------------------------------------------------------
@@ -495,6 +517,21 @@ void __fastcall TMainForm::UpdateMap(void)
 			Table0->Cells[12][i];
 		GoogleMapView->AddMark(lat,lon,title,msg);
 	}
+}
+//---------------------------------------------------------------------------
+void __fastcall TMainForm::BtnStaClick(TObject *Sender)
+{
+	if (StaListDialog->ShowModal()!=mrOk) return;
+}
+//---------------------------------------------------------------------------
+void __fastcall TMainForm::UpdateEnable(void)
+{
+	BtnSta->Enabled=StaMask->Checked;
+}
+//---------------------------------------------------------------------------
+void __fastcall TMainForm::StaMaskClick(TObject *Sender)
+{
+	UpdateEnable();
 }
 //---------------------------------------------------------------------------
 

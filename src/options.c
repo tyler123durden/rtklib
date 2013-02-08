@@ -298,7 +298,7 @@ extern int loadopts(const char *file, opt_t *opts)
         if (buff[0]=='\0') continue;
         
         if (!(p=strstr(buff,"="))) {
-            trace(1,"loadopts: invalid option %s (%s:%d)\n",buff,file,n);
+            fprintf(stderr,"invalid option %s (%s:%d)\n",buff,file,n);
             continue;
         }
         *p++='\0';
@@ -306,7 +306,7 @@ extern int loadopts(const char *file, opt_t *opts)
         if (!(opt=searchopt(buff,opts))) continue;
         
         if (!str2opt(opt,p)) {
-            trace(1,"loadopts: invalid option value %s (%s:%d)\n",buff,file,n);
+            fprintf(stderr,"invalid option value %s (%s:%d)\n",buff,file,n);
             continue;
         }
     }

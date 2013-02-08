@@ -123,6 +123,42 @@ object MainForm: TMainForm
       OnChange = AddressChange
       OnKeyPress = AddressKeyPress
     end
+    object StaMask: TCheckBox
+      Left = 463
+      Top = 3
+      Width = 71
+      Height = 17
+      Caption = 'STA'
+      TabOrder = 1
+      OnClick = StaMaskClick
+    end
+    object BtnSta: TButton
+      Left = 501
+      Top = 1
+      Width = 22
+      Height = 21
+      Caption = '...'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -9
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 2
+      OnClick = BtnStaClick
+    end
+    object FiltFmt: TComboBox
+      Left = 390
+      Top = 0
+      Width = 66
+      Height = 21
+      TabOrder = 3
+      Items.Strings = (
+        ''
+        'RTCM 3'
+        'RTCM 2'
+        'RAW')
+    end
   end
   object Table2: TStringGrid
     Left = 0

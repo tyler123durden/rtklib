@@ -34,6 +34,7 @@ public:
     int  __fastcall GetState(void);
     void __fastcall ClearMark(void);
     void __fastcall AddMark(double lat, double lon, AnsiString title, AnsiString msg);
+    void __fastcall PosMark(double lat, double lon, AnsiString title);
     void __fastcall HighlightMark(AnsiString title);
 };
 //---------------------------------------------------------------------------

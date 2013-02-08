@@ -458,13 +458,11 @@ object MainForm: TMainForm
     object MsgLabel1: TLabel
       Left = 2
       Top = 2
-      Width = 440
-      Height = 20
+      Width = 3
+      Height = 13
       Align = alClient
       Alignment = taCenter
       Layout = tlCenter
-      ExplicitWidth = 3
-      ExplicitHeight = 13
     end
   end
   object Msg3: TPanel
@@ -485,6 +483,15 @@ object MainForm: TMainForm
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 3
+    object MsgLabel3: TLabel
+      Left = 2
+      Top = 2
+      Width = 3
+      Height = 13
+      Align = alClient
+      Alignment = taCenter
+      Layout = tlCenter
+    end
     object BtnTray: TSpeedButton
       Left = 422
       Top = 2
@@ -521,17 +528,6 @@ object MainForm: TMainForm
       Caption = '?'
       Flat = True
       OnClick = BtnHelpClick
-    end
-    object MsgLabel3: TLabel
-      Left = 2
-      Top = 2
-      Width = 440
-      Height = 20
-      Align = alClient
-      Alignment = taCenter
-      Layout = tlCenter
-      ExplicitWidth = 3
-      ExplicitHeight = 13
     end
   end
   object Msg2: TPanel
@@ -692,13 +688,11 @@ object MainForm: TMainForm
     object MsgLabel2: TLabel
       Left = 2
       Top = 2
-      Width = 440
-      Height = 20
+      Width = 3
+      Height = 13
       Align = alClient
       Alignment = taCenter
       Layout = tlCenter
-      ExplicitWidth = 3
-      ExplicitHeight = 13
     end
   end
   object OpenDialog: TOpenDialog

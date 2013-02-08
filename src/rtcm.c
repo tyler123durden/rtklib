@@ -20,6 +20,7 @@
 *     [10] RTCM Paper 059-2011-SC104-635 (draft Galileo and QZSS ssr messages)
 *     [11] RTCM Paper 034-2012-SC104-693 (draft multiple signal messages)
 *     [12] RTCM Paper 133-2012-SC104-709 (draft QZSS MSM messages)
+*     [13] RTCM Paper 122-2012-SC104-707.r1 (draft MSM messages)
 *
 * version : $Revision:$ $Date:$
 * history : 2009/04/10 1.0  new
@@ -60,7 +61,7 @@ extern int init_rtcm(rtcm_t *rtcm)
     obsd_t data0={{0}};
     eph_t  eph0 ={0,-1,-1};
     geph_t geph0={0,-1};
-    ssr_t ssr0={{0}};
+    ssr_t ssr0={{{0}}};
     int i,j;
     
     trace(3,"init_rtcm:\n");

@@ -101,6 +101,7 @@
 			<TASM_DisplaySourceLines>true</TASM_DisplaySourceLines>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+			<Debugger_RunParams>-x 2</Debugger_RunParams>
 			<Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
 			<LinkPackageStatics>rtl.lib;vcl.lib;vclx.lib;vclimg.lib;bindengine.lib;bcbie.lib;vclie.lib</LinkPackageStatics>
 			<VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
@@ -230,6 +231,11 @@
 				<FormType>dfm</FormType>
 				<DependentOn>geview.h</DependentOn>
 				<BuildOrder>48</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="gmview.cpp">
+				<Form>GoogleMapView</Form>
+				<DependentOn>gmview.h</DependentOn>
+				<BuildOrder>49</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="mapdlg.cpp">
 				<BuildOrder>42</BuildOrder>
@@ -364,19 +370,19 @@
 				<BuildOrder>48</BuildOrder>
 			</CppCompile>
 			<FormResources Include="pntdlg.dfm"/>
-			<FormResources Include="satdlg.dfm"/>
 			<FormResources Include="plotopt.dfm"/>
-			<FormResources Include="..\appcmn\refdlg.dfm"/>
+			<FormResources Include="satdlg.dfm"/>
 			<FormResources Include="..\appcmn\keydlg.dfm"/>
-			<FormResources Include="..\appcmn\timedlg.dfm"/>
 			<FormResources Include="..\appcmn\tcpoptdlg.dfm"/>
 			<FormResources Include="..\appcmn\serioptdlg.dfm"/>
+			<FormResources Include="..\appcmn\refdlg.dfm"/>
 			<FormResources Include="..\appcmn\confdlg.dfm"/>
 			<FormResources Include="..\appcmn\cmdoptdlg.dfm"/>
 			<FormResources Include="..\appcmn\aboutdlg.dfm"/>
 			<FormResources Include="..\appcmn\ftpoptdlg.dfm"/>
 			<FormResources Include="..\appcmn\fileoptdlg.dfm"/>
 			<FormResources Include="..\appcmn\console.dfm"/>
+			<FormResources Include="..\appcmn\timedlg.dfm"/>
 			<FormResources Include="mapdlg.dfm"/>
 			<FormResources Include="plotmain.dfm"/>
 			<FormResources Include="..\appcmn\vieweropt.dfm"/>
@@ -385,6 +391,7 @@
 			<FormResources Include="geview.dfm"/>
 			<FormResources Include="fileseldlg.dfm"/>
 			<FormResources Include="conndlg.dfm"/>
+			<FormResources Include="gmview.dfm"/>
 			<BuildConfiguration Include="Release">
 				<Key>Cfg_2</Key>
 				<CfgParent>Base</CfgParent>

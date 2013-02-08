@@ -1,7 +1,7 @@
 /*------------------------------------------------------------------------------
 * rtklib.h : rtklib constants, types and function prototypes
 *
-*          Copyright (C) 2007-2012 by T.TAKASU, All rights reserved.
+*          Copyright (C) 2007-2013 by T.TAKASU, All rights reserved.
 *
 * options : -DENAGLO   enable GLONASS
 *           -DENAGAL   enable Galileo
@@ -22,7 +22,7 @@
 *           2009/12/25 1.7  rtklib ver.2.3.0
 *           2010/07/29 1.8  rtklib ver.2.4.0
 *           2011/05/27 1.9  rtklib ver.2.4.1
-*           2013/01/03 1.10 rtklib ver.2.4.2
+*           2013/02/01 1.10 rtklib ver.2.4.2
 *-----------------------------------------------------------------------------*/
 #ifndef RTKLIB_H
 #define RTKLIB_H
@@ -45,7 +45,7 @@ extern "C" {
 
 /* constants -----------------------------------------------------------------*/
 
-#define VER_RTKLIB  "2.4.2 b9"          /* library version */
+#define VER_RTKLIB  "2.4.2 b10"         /* library version */
 
 #define COPYRIGHT_RTKLIB \
             "Copyright (C) 2007-2013 by T.Takasu\nAll rights reserved."
@@ -273,7 +273,7 @@ extern "C" {
 #define CODE_L3I    44                  /* obs code: G3I        (GLO) */
 #define CODE_L3Q    45                  /* obs code: G3Q        (GLO) */
 #define CODE_L3X    46                  /* obs code: G3I+Q      (GLO) */
-#define MAXCODE     46                  /* max number of obs code */
+#define MAXCODE     48                  /* max number of obs code */
 
 #define PMODE_SINGLE 0                  /* positioning mode: single */
 #define PMODE_DGPS   1                  /* positioning mode: DGPS/DGNSS */
@@ -689,12 +689,12 @@ typedef struct {        /* DGPS/GNSS correction type */
 } dgps_t;
 
 typedef struct {        /* SSR correction type */
-    gtime_t t0;         /* epoch time (GPST) */
-    double udint;       /* SSR update interval (s) */
+    gtime_t t0[5];      /* epoch time (GPST) {eph,clk,hrclk,ura,bias} */
+    double udi[5];      /* SSR update interval (s) */
+    int iod[5];         /* iod ssr {eph,clk,hrclk,ura,bias} */
     int iode;           /* issue of data */
     int ura;            /* URA indicator */
     int refd;           /* sat ref datum (0:ITRF,1:regional) */
-    int iod[5];         /* iod ssr {eph,clk,hrclk,ura,bias} */
     double deph [3];    /* delta orbit {radial,along,cross} (m) */
     double ddeph[3];    /* dot delta orbit {radial,along,cross} (m/s) */
     double dclk [3];    /* delta clock {c0,c1,c2} (m,m/s,m/s^2) */

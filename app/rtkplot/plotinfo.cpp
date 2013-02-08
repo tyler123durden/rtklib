@@ -25,7 +25,7 @@ void __fastcall TPlot::UpdateInfo(void)
 void __fastcall TPlot::UpdateTimeObs(void)
 {
     AnsiString msgs1[]={" OBS=L1/2 "," L1 "," L2 "," L1/2/5 "," L1/5 ",""," L5 "};
-    AnsiString msgs2[]={" SNR=...45","...40","...35","...30","...25 ",""," <25 "};
+    AnsiString msgs2[]={" SNR=...45.","..40.","..35.","..30.","..25 ",""," <25 "};
     AnsiString msgs3[]={" SYS=GPS ","GLO ","GAL ","QZS ","BDS ","SBS ",""};
     AnsiString msg,msgs[8],s;
     double azel[MAXOBS*2],dop[4]={0};
@@ -125,7 +125,7 @@ void __fastcall TPlot::UpdateInfoObs(void)
 {
     AnsiString msgs0[]={"  NSAT"," GDOP"," PDOP"," HDOP"," VDOP","",""};
     AnsiString msgs1[]={" OBS=L1/2 "," L1 "," L2 "," L1/2/5 "," L1/5 ",""," L5 "};
-    AnsiString msgs2[]={" SNR=...45","...40","...35","...30","...25 ",""," <25 "};
+    AnsiString msgs2[]={" SNR=...45.","..40.","..35.","..30.","..25 ",""," <25 "};
     AnsiString msgs3[]={" SYS=GPS ","GLO ","GAL ","QZS ","BDS ","SBS ",""};
     AnsiString msg,msgs[8];
     gtime_t ts={0},te={0},t,tp={0};

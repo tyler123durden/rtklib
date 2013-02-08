@@ -148,6 +148,11 @@
 				<BuildOrder>-1</BuildOrder>
 				<BuildOrder>1</BuildOrder>
 			</ResFiles>
+			<CppCompile Include="staoptdlg.cpp">
+				<Form>StaListDialog</Form>
+				<DependentOn>staoptdlg.h</DependentOn>
+				<BuildOrder>20</BuildOrder>
+			</CppCompile>
 			<CppCompile Include="..\..\src\geoid.c">
 				<BuildOrder>7</BuildOrder>
 				<BuildOrder>14</BuildOrder>
@@ -205,9 +210,10 @@
 				<BuildOrder>4</BuildOrder>
 				<BuildOrder>15</BuildOrder>
 			</CppCompile>
-			<FormResources Include="..\appcmn\aboutdlg.dfm"/>
 			<FormResources Include="browsmain.dfm"/>
+			<FormResources Include="..\appcmn\aboutdlg.dfm"/>
 			<FormResources Include="..\appcmn\gmview.dfm"/>
+			<FormResources Include="staoptdlg.dfm"/>
 			<BuildConfiguration Include="Release">
 				<Key>Cfg_2</Key>
 				<CfgParent>Base</CfgParent>

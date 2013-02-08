@@ -326,7 +326,7 @@ object Plot: TPlot
     object Panel10: TPanel
       Left = 0
       Top = 0
-      Width = 390
+      Width = 412
       Height = 21
       Align = alLeft
       BevelOuter = bvNone
@@ -970,6 +970,38 @@ object Plot: TPlot
         Spacing = 1
         OnClick = BtnFixCentClick
       end
+      object BtnGM: TSpeedButton
+        Left = 390
+        Top = 0
+        Width = 19
+        Height = 21
+        Hint = 'Google Map View'
+        Flat = True
+        Glyph.Data = {
+          3E020000424D3E0200000000000036000000280000000D0000000D0000000100
+          1800000000000802000000000000000000000000000000000000FFFFFFFFFFFF
+          FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+          FF00FFFFFF7F7F7F7F7F7F7F7F7F7F7F7F7F7F7F7F7F7F7F7F7F7F7F7F7F7F7F
+          7F7F7F7F7F7FFFFFFF00FFFFFF7F7F7FFFFFFFEAD999EAD999EAD999FFFFFFFF
+          FFFFFFFFFFFFFFFFEAD9997F7F7FFFFFFF00FFFFFF7F7F7FEAD9991DE6B5EAD9
+          99EAD999EAD9991DE6B5EAD999EAD999EAD9997F7F7FFFFFFF00FFFFFF7F7F7F
+          EAD9991DE6B51DE6B5EAD999EAD9991DE6B5EAD9991DE6B51DE6B57F7F7FFFFF
+          FF00FFFFFF7F7F7FEAD9991DE6B51DE6B5EAD9991DE6B51DE6B5EAD999EAD999
+          EAD9997F7F7FFFFFFF00FFFFFF7F7F7F7F7F7F1DE6B57F7F7FEAD9997F7F7F1D
+          E6B57F7F7F1DE6B57F7F7F7F7F7FFFFFFF00FFFFFF7F7F7F1DE6B51DE6B5EAD9
+          99EAD999EAD9991DE6B51DE6B51DE6B5EAD9997F7F7FFFFFFF00FFFFFF7F7F7F
+          1DE6B51DE6B51DE6B5EAD9991DE6B51DE6B51DE6B51DE6B51DE6B57F7F7FFFFF
+          FF00FFFFFF7F7F7F1DE6B51DE6B5EAD999EAD999EAD9991DE6B51DE6B51DE6B5
+          FFFFFF7F7F7FFFFFFF00FFFFFF7F7F7FEAD999EAD999FFFFFFFFFFFFEAD999EA
+          D999FFFFFFFFFFFFEAD9997F7F7FFFFFFF00FFFFFF7F7F7F7F7F7F7F7F7F7F7F
+          7F7F7F7F7F7F7F7F7F7F7F7F7F7F7F7F7F7F7F7F7F7FFFFFFF00FFFFFFFFFFFF
+          FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+          FF00}
+        ParentShowHint = False
+        ShowHint = True
+        Spacing = 1
+        OnClick = BtnGMClick
+      end
       object DopType: TComboBox
         Left = 157
         Top = 0
@@ -1138,7 +1170,7 @@ object Plot: TPlot
       end
     end
     object Panel12: TPanel
-      Left = 390
+      Left = 412
       Top = 0
       Width = 136
       Height = 21
@@ -1369,6 +1401,9 @@ object Plot: TPlot
         Caption = 'Save # of Sats/DOP...'
         OnClick = MenuSaveDopClick
       end
+      object SaveSNRMPandAZEL1: TMenuItem
+        Caption = 'Save SNR, MP and AZ/EL...'
+      end
       object N5: TMenuItem
         Caption = '-'
       end
@@ -1473,6 +1508,10 @@ object Plot: TPlot
       object MenuGE: TMenuItem
         Caption = '&Google Earth View...'
         OnClick = MenuGEClick
+      end
+      object MenuGM: TMenuItem
+        Caption = 'Google &Map View...'
+        OnClick = MenuGMClick
       end
       object N11: TMenuItem
         Caption = '-'

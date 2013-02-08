@@ -25,6 +25,7 @@
 *           2012/02/01 1.11 add extended receiver error model
 *                           add glonass interchannel bias correction
 *                           add slip detectior by L1-L5 gf jump
+*                           output snr of rover receiver in residuals
 *-----------------------------------------------------------------------------*/
 #include <stdarg.h>
 #include "rtklib.h"
@@ -1584,7 +1585,9 @@ static int relpos(rtk_t *rtk, const obsd_t *obs, int nu, int nr,
         rtk->ssat[obs[i].sat-1].ph[obs[i].rcv-1][j]=obs[i].L[j];
     }
     for (i=0;i<ns;i++) for (j=0;j<nf;j++) {
-        rtk->ssat[sat[i]-1].snr[j]=MIN(obs[iu[i]].SNR[j],obs[ir[i]].SNR[j]);
+        
+        /* output snr of rover receiver */
+        rtk->ssat[sat[i]-1].snr[j]=obs[iu[i]].SNR[j];
     }
     for (i=0;i<MAXSAT;i++) for (j=0;j<nf;j++) {
         if (rtk->ssat[i].fix[j]==2&&stat!=SOLQ_FIX) rtk->ssat[i].fix[j]=1;

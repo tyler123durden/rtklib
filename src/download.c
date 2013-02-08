@@ -44,7 +44,7 @@ extern int execcmd_to(const char *cmd)
     PROCESS_INFORMATION info;
     STARTUPINFO si={0};
     DWORD stat;
-    char cmds[2048];
+    char cmds[4096];
     
     si.cb=sizeof(si);
     sprintf(cmds,"cmd /c %s",cmd);
@@ -127,9 +127,14 @@ static void remot2local(const char *remot, const char *dir, char *local)
 /* test file existance -------------------------------------------------------*/
 static int exist_file(const char *local)
 {
+#ifdef WIN32
+    DWORD stat=GetFileAttributes(local);
+    return stat!=0xFFFFFFFF;
+#else
     struct stat buff;
     if (stat(local,&buff)) return 0;
     return buff.st_mode&S_IREAD;
+#endif
 }
 /* test file existance -------------------------------------------------------*/
 static int test_file(const char *local)
@@ -269,11 +274,10 @@ static int mkdir_r(const char *dir)
     char pdir[1024],*p;
     
 #ifdef WIN32
-    DWORD err;
     HANDLE h;
     WIN32_FIND_DATA data;
     
-    if (!*dir) return 1;
+    if (!*dir||strstr(dir,":\\")) return 1;
     
     strcpy(pdir,dir);
     if ((p=strrchr(pdir,FILEPATHSEP))) {

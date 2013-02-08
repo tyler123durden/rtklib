@@ -87,6 +87,13 @@ void __fastcall TGoogleMapView::AddMark(double lat, double lon,
     ExecFunc(f.sprintf("AddMark(%.7f,%.7f,\"%s\",\"%s\")",lat,lon,title,msg));
 }
 //---------------------------------------------------------------------------
+void __fastcall TGoogleMapView::PosMark(double lat, double lon,
+    AnsiString title)
+{
+    AnsiString f;
+    ExecFunc(f.sprintf("PosMark(%.7f,%.7f,\"%s\")",lat,lon,title));
+}
+//---------------------------------------------------------------------------
 void __fastcall TGoogleMapView::HighlightMark(AnsiString title)
 {
     AnsiString f;

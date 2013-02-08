@@ -7,6 +7,7 @@
 #include "graph.h"
 #include "refdlg.h"
 #include "geview.h"
+#include "gmview.h"
 
 #define ATAN2(x,y)  ((x)*(x)+(y)*(y)>1E-12?atan2(x,y):0.0)
 
@@ -19,6 +20,7 @@ void __fastcall TPlot::UpdatePlot(void)
     UpdateInfo();
     Refresh();
     Refresh_GEView();
+    Refresh_GMView();
 }
 // refresh plot -------------------------------------------------------------
 void __fastcall TPlot::Refresh(void)
@@ -1850,9 +1852,12 @@ void __fastcall TPlot::Refresh_GEView(void)
             pos[2]-=geoidh(pos);
             GoogleEarthView->SetMark(2,pos);
             GoogleEarthView->ShowMark(2);
+            GoogleMapView->SetMark(2,pos);
+            GoogleMapView->ShowMark(2);
         }
         else {
             GoogleEarthView->HideMark(2);
+            GoogleMapView->HideMark(2);
         }
         if (BtnSol1->Down&&SolData[0].n>0) {
             sol=getsol(SolData,SolIndex[0]);
@@ -1860,9 +1865,12 @@ void __fastcall TPlot::Refresh_GEView(void)
             pos[2]-=geoidh(pos);
             GoogleEarthView->SetMark(1,pos);
             GoogleEarthView->ShowMark(1);
+            GoogleMapView->SetMark(1,pos);
+            GoogleMapView->ShowMark(1);
         }
         else {
             GoogleEarthView->HideMark(1);
+            GoogleMapView->HideMark(1);
         }
         // update heading
         if (opts[10]&&norm(pos,3)>0.0) {
@@ -1886,6 +1894,8 @@ void __fastcall TPlot::Refresh_GEView(void)
     else {
         GoogleEarthView->HideMark(1);
         GoogleEarthView->HideMark(2);
+        GoogleMapView->HideMark(1);
+        GoogleMapView->HideMark(2);
     }
     // update track
     if (BtnSol1->Down&&!BtnConnect->Down) {
@@ -1915,4 +1925,8 @@ void __fastcall TPlot::Refresh_GEView(void)
     else {
         GoogleEarthView->HidePoint();
     }
+}
+// refresh google map view -----------------------------------------------------
+void __fastcall TPlot::Refresh_GMView(void)
+{
 }

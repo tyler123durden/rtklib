@@ -1135,9 +1135,9 @@ static int encode_ssr1(rtcm_t *rtcm, int sys, int sync)
     for (j=nsat=0;j<MAXSAT;j++) {
         if (satsys(j+1,&prn)!=sys||!rtcm->ssr[j].update) continue;
         nsat++;
-        udint=rtcm->ssr[j].udint;
-        refd =rtcm->ssr[j].refd;
+        udint=rtcm->ssr[j].udi[0];
         iod  =rtcm->ssr[j].iod[0];
+        refd =rtcm->ssr[j].refd;
     }
     /* encode ssr header */
     i=encode_ssr_head(1,rtcm,sys,nsat,sync,iod,udint,refd,0,0);
@@ -1185,7 +1185,7 @@ static int encode_ssr2(rtcm_t *rtcm, int sys, int sync)
     for (j=nsat=0;j<MAXSAT;j++) {
         if (satsys(j+1,&prn)!=sys||!rtcm->ssr[j].update) continue;
         nsat++;
-        udint=rtcm->ssr[j].udint;
+        udint=rtcm->ssr[j].udi[1];
         iod  =rtcm->ssr[j].iod[1];
     }
     /* encode ssr header */
@@ -1246,7 +1246,7 @@ static int encode_ssr3(rtcm_t *rtcm, int sys, int sync)
     for (j=nsat=0;j<MAXSAT;j++) {
         if (satsys(j+1,&prn)!=sys||!rtcm->ssr[j].update) continue;
         nsat++;
-        udint=rtcm->ssr[j].udint;
+        udint=rtcm->ssr[j].udi[4];
         iod  =rtcm->ssr[j].iod[4];
     }
     /* encode ssr header */
@@ -1290,9 +1290,9 @@ static int encode_ssr4(rtcm_t *rtcm, int sys, int sync)
     for (j=nsat=0;j<MAXSAT;j++) {
         if (satsys(j+1,&prn)!=sys||!rtcm->ssr[j].update) continue;
         nsat++;
-        udint=rtcm->ssr[j].udint;
-        refd =rtcm->ssr[j].refd;
+        udint=rtcm->ssr[j].udi[0];
         iod  =rtcm->ssr[j].iod[0];
+        refd =rtcm->ssr[j].refd;
     }
     /* encode ssr header */
     i=encode_ssr_head(4,rtcm,sys,nsat,sync,iod,udint,refd,0,0);
@@ -1346,7 +1346,7 @@ static int encode_ssr5(rtcm_t *rtcm, int sys, int sync)
     for (j=nsat=0;j<MAXSAT;j++) {
         if (satsys(j+1,&prn)!=sys||!rtcm->ssr[j].update) continue;
         nsat++;
-        udint=rtcm->ssr[j].udint;
+        udint=rtcm->ssr[j].udi[3];
         iod  =rtcm->ssr[j].iod[3];
     }
     /* encode ssr header */
@@ -1381,7 +1381,7 @@ static int encode_ssr6(rtcm_t *rtcm, int sys, int sync)
     for (j=nsat=0;j<MAXSAT;j++) {
         if (satsys(j+1,&prn)!=sys||!rtcm->ssr[j].update) continue;
         nsat++;
-        udint=rtcm->ssr[j].udint;
+        udint=rtcm->ssr[j].udi[2];
         iod  =rtcm->ssr[j].iod[2];
     }
     /* encode ssr header */

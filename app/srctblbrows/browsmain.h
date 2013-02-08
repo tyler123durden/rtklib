@@ -53,6 +53,10 @@ __published:
 	TPanel *Panel3;
 	TSpeedButton *BtnMap;
 	TTimer *Timer;
+	TComboBox *FiltFmt;
+	TCheckBox *StaMask;
+	TButton *BtnSta;
+	
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall BtnUpdateClick(TObject *Sender);
 	void __fastcall TypeChange(TObject *Sender);
@@ -83,6 +87,8 @@ __published:
 	void __fastcall BtnMapClick(TObject *Sender);
 	void __fastcall TimerTimer(TObject *Sender);
 	void __fastcall Table0SelectCell(TObject *Sender, int ACol, int ARow, bool &CanSelect);
+	void __fastcall BtnStaClick(TObject *Sender);
+	void __fastcall StaMaskClick(TObject *Sender);
 
 private:
 	AnsiString AddrList,AddrCaster,SrcTable,IniFile;
@@ -90,9 +96,12 @@ private:
 	void __fastcall UpdateCaster(void);
 	void __fastcall UpdateTable(void);
 	void __fastcall UpdateMap(void);
+	void __fastcall UpdateEnable(void);
 	void __fastcall ShowTable(void);
 	void __fastcall SortTable(TStringGrid *table, int col);
 public:
+	TStringList *StaList;
+
 	void __fastcall ShowMsg(const char *msg);
 	__fastcall TMainForm(TComponent* Owner);
 };

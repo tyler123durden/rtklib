@@ -22,6 +22,7 @@
 *           2011/03/22  1.9  add function reading g_tec file
 *           2011/08/20  1.10 fix bug on freez if solstatic=single and combined
 *           2011/09/15  1.11 add function reading stec file
+*           2012/02/01  1.12 support keyword expansion of rtcm ssr corrections
 *-----------------------------------------------------------------------------*/
 #include "rtklib.h"
 
@@ -57,8 +58,10 @@ static int isolf=0;             /* current forward solutions index */
 static int isolb=0;             /* current backward solutions index */
 static char proc_rov [64]="";   /* rover for current processing */
 static char proc_base[64]="";   /* base station for current processing */
+static char rtcm_file[1024]=""; /* rtcm data file */
+static char rtcm_path[1024]=""; /* rtcm data path */
+static rtcm_t rtcm;             /* rtcm control struct */
 static FILE *fp_rtcm=NULL;      /* rtcm data file pointer */
-static rtcm_t rtcm;             /* rtcm data structure */
 
 /* show message and check break ----------------------------------------------*/
 static int checkbrk(const char *format, ...)
@@ -181,8 +184,8 @@ static int nextobsb(const obs_t *obs, int *i, int rcv)
 static int inputobs(obsd_t *obs, int solq, const prcopt_t *popt)
 {
     gtime_t time={0};
+    char path[1024];
     int i,nu,nr,n=0;
-char str[32];
     
     trace(3,"infunc  : revs=%d iobsu=%d iobsr=%d isbs=%d\n",revs,iobsu,iobsr,isbs);
     
@@ -225,17 +228,28 @@ char str[32];
             ilex++;
         }
         /* update rtcm corrections */
-        if (fp_rtcm) {
-            if (rtcm.time.time==0) rtcm.time=obs[0].time;
+        if (*rtcm_file) {
             
-#if 1
-            while (timediff(rtcm.time,obs[0].time)<-1.0) {
-#else
-            while (timediff(rtcm.time,obs[0].time)<5.0) {
-#endif
-                if (input_rtcm3f(&rtcm,fp_rtcm)==-2) break;
+            /* open or swap rtcm file */
+            reppath(rtcm_file,path,obs[0].time,"","");
+            
+            if (strcmp(path,rtcm_path)) {
+                strcpy(rtcm_path,path);
+                
+                if (fp_rtcm) fclose(fp_rtcm);
+                fp_rtcm=fopen(path,"rb");
+                if (fp_rtcm) {
+                    rtcm.time=obs[0].time;
+                    input_rtcm3f(&rtcm,fp_rtcm);
+                    trace(2,"rtcm file open: %s\n",path);
+                }
             }
-            for (i=0;i<MAXSAT;i++) navs.ssr[i]=rtcm.ssr[i];
+            if (fp_rtcm) {
+                while (timediff(rtcm.time,obs[0].time)<1.0) {
+                    if (input_rtcm3f(&rtcm,fp_rtcm)<-1) break;
+                }
+                for (i=0;i<MAXSAT;i++) navs.ssr[i]=rtcm.ssr[i];
+            }
         }
     }
     else { /* input backward data */
@@ -480,14 +494,16 @@ static void readpreceph(char **infile, int n, const prcopt_t *prcopt,
     }
     for (i=0;i<nav->ns;i++) nav->seph[i]=seph0;
     
-    /* initialize rtcm struct and open rtcm file */
+    /* set rtcm file and initialize rtcm struct */
+    rtcm_file[0]=rtcm_path[0]='\0'; fp_rtcm=NULL;
+    
     for (i=0;i<n;i++) {
-        if (strstr(infile[i],"%r")||strstr(infile[i],"%b")) continue;
-        if (!(ext=strrchr(infile[i],'.'))) continue;
-        if (strcmp(ext,".rtcm3")&&strcmp(ext,".RTCM3")) continue;
-        fp_rtcm=fopen(infile[i],"rb");
-        init_rtcm(&rtcm);
-        break;
+        if ((ext=strrchr(infile[i],'.'))&&
+            (!strcmp(ext,".rtcm3")||!strcmp(ext,".RTCM3"))) {
+            strcpy(rtcm_file,infile[i]);
+            init_rtcm(&rtcm);
+            break;
+        }
     }
 }
 /* free prec ephemeris and sbas data -----------------------------------------*/
@@ -508,9 +524,9 @@ static void freepreceph(nav_t *nav, sbs_t *sbs, lex_t *lex)
     }
     free(nav->tec ); nav->tec =NULL; nav->nt=nav->ntmax=0;
     stec_free(nav);
-    if (fp_rtcm) {
-        fclose(fp_rtcm); fp_rtcm=NULL;
-    }
+    
+    if (fp_rtcm) fclose(fp_rtcm);
+    free_rtcm(&rtcm);
 }
 /* read obs and nav data -----------------------------------------------------*/
 static int readobsnav(gtime_t ts, gtime_t te, double ti, char **infile,
@@ -1122,15 +1138,20 @@ extern int postpos(gtime_t ts, gtime_t te, double ti, double tu,
             }
             for (j=k=nf=0;j<n;j++) {
                 
-                /* include next day precise ephemeris */
-                ttte=tte;
-                if ((ext=strrchr(infile[j],'.'))&&
-                    (!strcmp(ext,".sp3")||!strcmp(ext,".SP3")||
-                     !strcmp(ext,".eph")||!strcmp(ext,".EPH"))) {
-                    ttte=timeadd(ttte,3600.0);
-                }
-                nf+=reppaths(infile[j],ifile+nf,MAXINFILE-nf,tts,ttte,"","");
+                ext=strrchr(infile[j],'.');
                 
+                if (ext&&(!strcmp(ext,".rtcm3")||!strcmp(ext,".RTCM3"))) {
+                    strcpy(ifile[nf++],infile[j]);
+                }
+                else {
+                    /* include next day precise ephemeris */
+                    ttte=tte;
+                    if (ext&&(!strcmp(ext,".sp3")||!strcmp(ext,".SP3")||
+                              !strcmp(ext,".eph")||!strcmp(ext,".EPH"))) {
+                        ttte=timeadd(ttte,3600.0);
+                    }
+                    nf+=reppaths(infile[j],ifile+nf,MAXINFILE-nf,tts,ttte,"","");
+                }
                 while (k<nf) index[k++]=j;
                 
                 if (nf>=MAXINFILE) {

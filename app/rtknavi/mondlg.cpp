@@ -1826,21 +1826,21 @@ void __fastcall TMonitorDialog::ShowRtcmDgps(void)
 void __fastcall TMonitorDialog::SetRtcmSsr(void)
 {
 	AnsiString s,label[]={
-		"SAT","Status","Intv(s)","IOD","URA","Datum","T0",
+		"SAT","Status","UDI(s)","UDHR(s)","IOD","URA","Datum","T0",
 		"D0-A(m)","D0-C(m)","D0-R(m)","D1-A(mm/s)","D1-C(mm/s)","D1-R(mm/s)",
 		"C0(m)","C1(mm/s)","C2(mm/s2)","C-HR(m)"
 	};
-	int i,width[]={25,30,30,30,25,15,115,50,50,50,50,50,50,50,50,50,50};
+	int i,width[]={25,30,30,30,30,25,15,115,50,50,50,50,50,50,50,50,50,50};
 	char *code;
 
-	Tbl->ColCount=17+MAXCODE;
+	Tbl->ColCount=18+MAXCODE;
 	Tbl->RowCount=2;
-	for (i=0;i<17;i++) {
+	for (i=0;i<18;i++) {
 		Tbl->ColWidths[i]=width[i]*FontScale/96;
 		Tbl->Cells[i][0]=label[i];
 		Tbl->Cells[i][1]="";
 	}
-	for (i=17;i<Tbl->ColCount;i++) {
+	for (i=18;i<Tbl->ColCount;i++) {
 		code=code2obs(i-16,NULL);
 		Tbl->ColWidths[i]=40*FontScale/96;
 		Tbl->Cells[i][0]=s.sprintf("BL%s(m)",code);
@@ -1873,13 +1873,14 @@ void __fastcall TMonitorDialog::ShowRtcmSsr(void)
 		j=0;
 		satno2id(i+1,id);
 		Tbl->Cells[j++][i+1]=id;
-		valid=ssr[i].t0.time&&fabs(timediff(time,ssr[i].t0))<=1800.0;
+		valid=ssr[i].t0[0].time&&fabs(timediff(time,ssr[i].t0[0]))<=1800.0;
 		Tbl->Cells[j++][i+1]=valid?"OK":"-";
-		Tbl->Cells[j++][i+1]=s.sprintf("%.0f",ssr[i].udint);
+		Tbl->Cells[j++][i+1]=s.sprintf("%.0f",ssr[i].udi[0]);
+		Tbl->Cells[j++][i+1]=s.sprintf("%.0f",ssr[i].udi[2]);
 		Tbl->Cells[j++][i+1]=s.sprintf("%d",ssr[i].iode);
 		Tbl->Cells[j++][i+1]=s.sprintf("%d",ssr[i].ura);
 		Tbl->Cells[j++][i+1]=s.sprintf("%d",ssr[i].refd);
-		if (ssr[i].t0.time) time2str(ssr[i].t0,tstr,0); else strcpy(tstr,"-");
+		if (ssr[i].t0[0].time) time2str(ssr[i].t0[0],tstr,0); else strcpy(tstr,"-");
 		Tbl->Cells[j++][i+1]=tstr;
 		for (k=0;k<3;k++) {
 			Tbl->Cells[j++][i+1]=s.sprintf("%.3f",ssr[i].deph[k]);
